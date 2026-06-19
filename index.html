@@ -1,107 +1,682 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語發音點讀機 (內地直連版)</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1, h2 { color: #2c3e50; text-align: center; }
-        
-        /* 視覺顯示區 (取代黑畫面) */
-        .visual-container {
-            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
-            border-radius: 12px; padding: 40px 20px; text-align: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1); margin: 20px auto; max-width: 480px;
-            color: white; font-size: 48px; font-weight: bold; letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); transition: all 0.3s;
-        }
-        
-        .category-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .category-title { border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px; color: #34495e; font-size: 20px; font-weight: bold; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-        
-        .word-btn {
-            background-color: #f1f3f5; border: 2px solid #dee2e6; border-radius: 8px;
-            padding: 12px; text-align: left; cursor: pointer; transition: all 0.2s ease;
-        }
-        .word-btn:hover { background-color: #e2e6ea; border-color: #0056b3; transform: translateY(-2px); }
-        .word-title { font-size: 18px; font-weight: bold; color: #0056b3; margin-bottom: 4px; }
-        .word-ipa { font-size: 14px; color: #6c757d; font-family: 'Courier New', Courier, monospace; }
-        
-        .type-badge { display: inline-block; font-size: 11px; background: #e0e0e0; padding: 2px 6px; border-radius: 4px; margin-left: 5px; color: #555;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Max Xu — Operations · Technology · Finance</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── THEME TOKENS ───────────────────────────── */
+html[data-theme="dark"]{
+  --bg:#0C0A09; --surface:#16130F; --surface-2:#1F1B16;
+  --border:#2E2823; --border-soft:#211D18;
+  --text:#F5F2EC; --muted:#B8AE9E; --faint:#8A8074;
+  --accent:#C8A24A; --accent-bright:#E3C476; --accent-soft:rgba(200,162,74,.12);
+  --accent-text:#D8B65E; --on-accent:#171310;
+  --line:#4A4136; --good:#5FA572;
+  --grid:#1C1813; --vignette:rgba(0,0,0,.55);
+}
+html[data-theme="light"]{
+  --bg:#F7F4EE; --surface:#FFFFFF; --surface-2:#F1ECE2;
+  --border:#E3DCCF; --border-soft:#ECE6DA;
+  --text:#1A1714; --muted:#5C544A; --faint:#94897A;
+  --accent:#A87B1E; --accent-bright:#8A6516; --accent-soft:rgba(168,123,30,.10);
+  --accent-text:#876219; --on-accent:#FFFFFF;
+  --line:#CBC1B0; --good:#3F7A52;
+  --grid:#EAE3D5; --vignette:rgba(247,244,238,.4);
+}
+:root{ --radius:14px; --maxw:1080px; --ease:cubic-bezier(.16,1,.3,1); }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'DM Sans',sans-serif; line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  transition:background .4s var(--ease), color .4s var(--ease);
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 0%,transparent 75%);
+          mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 0%,transparent 75%);
+  opacity:.6; transition:background-image .4s var(--ease);
+}
+.wrap{position:relative; z-index:1; max-width:var(--maxw); margin:0 auto; padding:0 24px}
+
+/* ── HEADER / NAV ───────────────────────────── */
+header.site{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  background:color-mix(in srgb, var(--bg) 78%, transparent);
+  border-bottom:1px solid var(--border-soft);
+}
+.nav{max-width:var(--maxw); margin:0 auto; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px}
+.brand{display:flex; align-items:center; gap:10px; font-family:'Space Grotesk'; font-weight:700; letter-spacing:.5px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.brand .mono{font-family:'JetBrains Mono'; font-size:.78rem; color:var(--faint); font-weight:500}
+.nav-right{display:flex; align-items:center; gap:10px}
+nav.links{display:flex; gap:4px; overflow-x:auto; scrollbar-width:none}
+nav.links::-webkit-scrollbar{display:none}
+nav.links a{
+  font-family:'JetBrains Mono'; font-size:.78rem; color:var(--muted);
+  text-decoration:none; padding:7px 12px; border-radius:8px; white-space:nowrap;
+  transition:color .2s var(--ease), background .2s var(--ease);
+}
+nav.links a:hover{color:var(--text); background:var(--surface-2)}
+nav.links a.active{color:var(--accent-text); background:var(--accent-soft)}
+nav.links a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.theme-btn{
+  display:flex; align-items:center; justify-content:center; width:36px; height:36px;
+  border-radius:9px; border:1px solid var(--border); background:var(--surface);
+  color:var(--muted); cursor:pointer; transition:all .2s var(--ease); flex-shrink:0;
+}
+.theme-btn:hover{color:var(--accent-text); border-color:var(--line)}
+.theme-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.theme-btn .moon{display:none}
+html[data-theme="light"] .theme-btn .sun{display:none}
+html[data-theme="light"] .theme-btn .moon{display:block}
+
+section{scroll-margin-top:78px; padding:72px 0}
+.eyebrow{font-family:'JetBrains Mono'; font-size:.74rem; letter-spacing:2px; text-transform:uppercase; color:var(--accent-text); margin-bottom:14px; display:flex; align-items:center; gap:8px}
+.eyebrow::before{content:""; width:22px; height:1px; background:var(--accent)}
+
+/* ── HERO ───────────────────────────── */
+.hero{padding-top:64px}
+.status{display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono'; font-size:.74rem; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:6px 12px; border-radius:999px; margin-bottom:26px}
+.status .pulse{width:7px;height:7px;border-radius:50%;background:var(--good);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 55%,transparent)}50%{box-shadow:0 0 0 5px transparent}}
+.hero h1{font-family:'Space Grotesk'; font-weight:700; font-size:clamp(2.6rem,7vw,4.4rem); line-height:1.02; margin:0 0 10px; letter-spacing:-1.5px}
+.hero h1 .grad{background:linear-gradient(120deg,var(--text) 30%,var(--accent) 130%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+.hero h1 .sub{display:block; color:var(--faint); font-size:clamp(1rem,2.4vw,1.3rem); font-weight:500; letter-spacing:0; margin-top:14px}
+.hero .lead{max-width:580px; color:var(--muted); font-size:1.06rem; margin:22px 0 0}
+.hero .lead strong{color:var(--text); font-weight:600}
+.hero .lead .gold{color:var(--accent-text); font-weight:600}
+
+.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:44px}
+.stat{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 16px; transition:border-color .25s var(--ease), transform .25s var(--ease)}
+.stat:hover{border-color:var(--line); transform:translateY(-3px)}
+.stat .num{font-family:'Space Grotesk'; font-weight:700; font-size:1.7rem; color:var(--accent-text)}
+.stat .lbl{font-family:'JetBrains Mono'; font-size:.7rem; color:var(--faint); text-transform:uppercase; letter-spacing:1px; margin-top:4px}
+
+h2.title{font-family:'Space Grotesk'; font-weight:600; font-size:1.9rem; margin:0 0 6px; letter-spacing:-.5px}
+.section-note{color:var(--faint); font-size:.95rem; margin:0 0 34px; max-width:600px}
+
+/* ── NORTH STAR (scroll-zoom signature) ───────────────────────────── */
+.northstar{text-align:center; padding:96px 0}
+.northstar .ns-inner{will-change:transform; transform-origin:center}
+.northstar .ns-eyebrow{font-family:'JetBrains Mono'; font-size:.72rem; letter-spacing:3px; text-transform:uppercase; color:var(--accent-text); margin-bottom:20px}
+.northstar blockquote{
+  margin:0 auto; max-width:760px; font-family:'Space Grotesk'; font-weight:600;
+  font-size:clamp(1.7rem,4.6vw,3rem); line-height:1.18; letter-spacing:-.8px;
+}
+.northstar blockquote .hl{color:var(--accent-text)}
+.northstar .ns-sub{color:var(--muted); margin-top:22px; font-size:1.02rem; max-width:520px; margin-left:auto; margin-right:auto}
+
+/* ── ABOUT ───────────────────────────── */
+.about p{color:var(--muted); font-size:1.08rem; max-width:660px}
+.about p strong{color:var(--text)} .about p .gold{color:var(--accent-text); font-weight:600}
+
+/* ── EXPERIENCE (interactive role boxes) ───────────────────────────── */
+.exp-org{margin-bottom:34px}
+.exp-org-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border-soft)}
+.exp-org-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.25rem}
+.exp-org-date{font-family:'JetBrains Mono'; font-size:.74rem; color:var(--faint); margin-left:auto}
+.role-box{margin-bottom:10px; border:1px solid var(--border); border-radius:12px; background:var(--surface); overflow:hidden; transition:border-color .25s var(--ease)}
+.role-box:hover{border-color:var(--line)}
+.role-box[data-open="true"]{border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
+.role-head{width:100%; text-align:left; cursor:pointer; display:flex; align-items:center; gap:14px; padding:16px 18px; background:none; border:none; color:var(--text); font-family:inherit}
+.role-head:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.role-icon{flex-shrink:0; width:34px; height:34px; border-radius:9px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; color:var(--accent-text)}
+.role-titlewrap{flex:1}
+.role-title{font-family:'Space Grotesk'; font-weight:600; font-size:1.04rem}
+.role-tag{font-family:'JetBrains Mono'; font-size:.72rem; color:var(--faint); margin-top:2px}
+.role-plus{flex-shrink:0; color:var(--faint); transition:transform .35s var(--ease)}
+.role-box[data-open="true"] .role-plus{transform:rotate(45deg); color:var(--accent-text)}
+.role-detail{display:grid; grid-template-rows:0fr; transition:grid-template-rows .4s var(--ease)}
+.role-box[data-open="true"] .role-detail{grid-template-rows:1fr}
+.role-detail .rd-inner{overflow:hidden}
+.role-detail ul{margin:0 18px 16px; padding-left:20px; color:var(--muted); font-size:.95rem; padding-top:4px}
+.role-detail li{margin-bottom:7px} .role-detail li::marker{color:var(--line)}
+.photo-strip{display:flex; gap:10px; padding:0 18px 18px; flex-wrap:wrap}
+.photo-slot{flex:1 1 130px; min-width:120px; aspect-ratio:4/3; border:1.5px dashed var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--faint); font-family:'JetBrains Mono'; font-size:.66rem; text-align:center; background:var(--bg)}
+
+/* ── ROADMAP / SKILL TREE (hover-expand) ───────────────────────────── */
+.phases{display:grid; gap:18px}
+.phase{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:22px 22px 24px}
+.phase-head{display:flex; align-items:center; gap:12px; margin-bottom:18px}
+.phase-idx{font-family:'JetBrains Mono'; font-weight:600; font-size:.8rem; color:var(--accent-text); border:1px solid var(--border); border-radius:8px; padding:5px 9px; background:var(--bg)}
+.phase-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.15rem}
+.phase-sub{font-size:.78rem; color:var(--faint); margin-left:auto; font-family:'JetBrains Mono'}
+.node + .node{margin-top:10px}
+.node-head{width:100%; text-align:left; cursor:default; display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; color:var(--text); font-family:inherit; transition:border-color .2s var(--ease), background .2s var(--ease)}
+.node-code{font-family:'JetBrains Mono'; font-size:.76rem; font-weight:600; color:var(--accent-text); background:var(--accent-soft); padding:4px 8px; border-radius:6px; white-space:nowrap}
+.node-label{font-family:'Space Grotesk'; font-weight:500; font-size:1rem; flex:1}
+.chev{flex-shrink:0; color:var(--faint); transition:transform .35s var(--ease)}
+.branches{display:grid; grid-template-rows:0fr; transition:grid-template-rows .4s var(--ease)}
+.branches > .inner{overflow:hidden}
+/* hover OR keyboard-focus OR tap-pinned opens the node */
+.node:hover .node-head,
+.node:focus-within .node-head,
+.node.pinned .node-head{border-color:color-mix(in srgb,var(--accent) 55%,transparent); background:color-mix(in srgb,var(--surface-2) 70%, var(--accent-soft))}
+.node:hover .chev,
+.node:focus-within .chev,
+.node.pinned .chev{transform:rotate(90deg); color:var(--accent-text)}
+.node:hover .branches,
+.node:focus-within .branches,
+.node.pinned .branches{grid-template-rows:1fr}
+.node-desc{color:var(--muted); font-size:.92rem; margin:14px 4px 14px 18px; padding-top:2px}
+.leaves{list-style:none; margin:0 0 6px; padding:0 0 0 26px; position:relative}
+.leaves::before{content:""; position:absolute; left:10px; top:-4px; bottom:18px; width:2px; background:linear-gradient(var(--accent) 0%, var(--line) 100%)}
+.leaf{position:relative; padding:9px 14px; margin:9px 0; background:var(--bg); border:1px solid var(--border); border-radius:9px; font-size:.9rem; color:var(--text); opacity:0; transform:translateX(-10px)}
+.leaf::before{content:""; position:absolute; left:-16px; top:50%; width:16px; height:2px; background:var(--line)}
+.leaf::after{content:""; position:absolute; left:-18px; top:50%; transform:translateY(-50%); width:7px; height:7px; border-radius:50%; background:var(--accent); border:2px solid var(--bg)}
+.leaf .lk{font-family:'JetBrains Mono'; font-size:.7rem; color:var(--faint); margin-right:8px}
+.node:hover .leaf, .node:focus-within .leaf, .node.pinned .leaf{animation:leafIn .45s var(--ease) forwards}
+.node .leaf:nth-child(1){animation-delay:.04s}
+.node .leaf:nth-child(2){animation-delay:.11s}
+.node .leaf:nth-child(3){animation-delay:.18s}
+.node .leaf:nth-child(4){animation-delay:.25s}
+.node .leaf:nth-child(5){animation-delay:.32s}
+@keyframes leafIn{to{opacity:1; transform:translateX(0)}}
+.roadmap-goal{margin-top:18px; text-align:center; font-family:'JetBrains Mono'; font-size:.8rem; color:var(--faint)}
+.roadmap-goal b{color:var(--accent-text)}
+
+/* ── PROJECTS ───────────────────────────── */
+.proj{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:24px; margin-bottom:18px}
+.proj h3{font-family:'Space Grotesk'; font-weight:600; font-size:1.2rem; margin:0 0 6px; display:flex; align-items:center; gap:10px}
+.proj .tag{font-family:'JetBrains Mono'; font-size:.68rem; color:var(--faint); border:1px solid var(--border); padding:3px 7px; border-radius:5px; margin-left:auto; font-weight:500}
+.proj p{color:var(--muted); font-size:.96rem; margin:0 0 16px}
+.media-tabs{display:flex; gap:8px; margin-bottom:14px}
+.media-tab{font-family:'JetBrains Mono'; font-size:.74rem; padding:7px 13px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--muted); cursor:pointer; transition:all .2s var(--ease)}
+.media-tab:hover{border-color:var(--line)}
+.media-tab.active{background:var(--accent-soft); color:var(--accent-text); border-color:color-mix(in srgb,var(--accent) 40%,var(--border))}
+.media-tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.media-pane{display:none} .media-pane.active{display:block}
+.deck{display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-height:230px; border:1.5px dashed var(--border); border-radius:12px; background:var(--bg); color:var(--faint); padding:24px}
+.deck .mono{font-family:'JetBrains Mono'; font-size:.82rem; margin-top:8px}
+.deck code{background:var(--surface-2); padding:2px 6px; border-radius:4px; color:var(--accent-text)}
+.embed-row{display:flex; gap:8px; margin-top:16px; width:100%; max-width:460px}
+.embed-row input{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:10px 12px; color:var(--text); font-family:'JetBrains Mono'; font-size:.78rem}
+.embed-row input:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.embed-row button{background:var(--accent); color:var(--on-accent); border:none; border-radius:9px; padding:0 16px; font-family:'JetBrains Mono'; font-size:.78rem; font-weight:600; cursor:pointer}
+.deck iframe{width:100%; aspect-ratio:16/9; border:none; border-radius:10px}
+.gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px}
+.gallery .g-tile{aspect-ratio:4/3; border-radius:10px; overflow:hidden; border:1px solid var(--border); background:var(--bg)}
+.gallery .g-tile img{width:100%; height:100%; object-fit:cover; display:block}
+.gallery .g-add{aspect-ratio:4/3; border:1.5px dashed var(--border); border-radius:10px; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; color:var(--faint); font-family:'JetBrains Mono'; font-size:.7rem; cursor:pointer; background:var(--bg); transition:border-color .2s var(--ease)}
+.gallery .g-add:hover{border-color:var(--accent)}
+
+/* ── SKILLS ───────────────────────────── */
+.skill-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.skill-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px}
+.skill-card h4{font-family:'JetBrains Mono'; font-size:.74rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--faint); margin:0 0 16px}
+.lang-row{display:flex; align-items:center; gap:12px; margin-bottom:13px}
+.lang-row .name{width:90px; font-size:.92rem; font-weight:500}
+.lang-row .bar{flex:1; height:6px; background:var(--surface-2); border-radius:99px; overflow:hidden}
+.lang-row .fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-bright)); border-radius:99px; width:0; transition:width 1s var(--ease)}
+.lang-row .lvl{font-family:'JetBrains Mono'; font-size:.68rem; color:var(--faint); width:58px; text-align:right}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{font-size:.85rem; background:var(--surface-2); border:1px solid var(--border); padding:7px 12px; border-radius:8px; color:var(--muted)}
+
+/* ── CONTACT ───────────────────────────── */
+.contact{text-align:center; border-top:1px solid var(--border-soft); margin-top:20px}
+.contact h2{font-family:'Space Grotesk'; font-weight:700; font-size:clamp(1.8rem,5vw,2.8rem); letter-spacing:-1px; margin:0 0 10px}
+.contact p{color:var(--muted); margin:0 auto 28px; max-width:460px}
+.cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+.btn{display:inline-flex; align-items:center; gap:9px; text-decoration:none; font-family:'JetBrains Mono'; font-size:.86rem; font-weight:500; padding:13px 22px; border-radius:11px; transition:all .2s var(--ease)}
+.btn-primary{background:var(--accent); color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-bright); transform:translateY(-2px)}
+.btn-ghost{background:transparent; color:var(--text); border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--line); background:var(--surface)}
+.btn:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+footer{text-align:center; padding:30px 0 50px; color:var(--faint); font-family:'JetBrains Mono'; font-size:.74rem}
+
+/* ── REVEAL + SCROLL-ZOOM ───────────────────────────── */
+.reveal{opacity:0; transform:translateY(24px) scale(.96); transition:opacity .7s var(--ease), transform .7s var(--ease)}
+.reveal.in{opacity:1; transform:none}
+.zoom-in{opacity:0; transform:scale(.82); transition:opacity .8s var(--ease), transform .9s var(--ease)}
+.zoom-in.in{opacity:1; transform:scale(1)}
+
+@media(max-width:780px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .skill-grid{grid-template-columns:1fr}
+  .exp-org-date{margin-left:0; width:100%}
+  .nav{padding:12px 18px} .wrap{padding:0 18px} section{padding:56px 0}
+}
+@media(max-width:420px){ .brand .mono{display:none} .node-head{flex-wrap:wrap; gap:8px} }
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms !important; transition-duration:.001ms !important}
+  .reveal,.zoom-in,.leaf{opacity:1 !important; transform:none !important}
+  .northstar .ns-inner{transform:none !important}
+}
+</style>
 </head>
 <body>
 
-    <h1>👄 英語發音點讀機</h1>
-    
-    <div class="visual-container" id="visual-word">
-        點擊下方單字
+<header class="site">
+  <div class="nav">
+    <div class="brand">
+      <span class="dot"></span><span>MAX&nbsp;XU</span>
+      <span class="mono">// ops · tech · finance</span>
+    </div>
+    <div class="nav-right">
+      <nav class="links" aria-label="Section navigation">
+        <a href="#overview" class="active">overview</a>
+        <a href="#experience">experience</a>
+        <a href="#roadmap">roadmap</a>
+        <a href="#projects">projects</a>
+        <a href="#skills">skills</a>
+        <a href="#contact">contact</a>
+      </nav>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle light / dark mode" title="Toggle theme">
+        <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section id="overview" class="hero">
+    <div class="status"><span class="pulse"></span> Aspiring asset manager · open to internships</div>
+    <h1>
+      <span class="grad">Xu Pok Yuen, Max</span>
+      <span class="sub">Information Systems @ HKUST — bridging operations, technology &amp; finance.</span>
+    </h1>
+    <p class="lead">
+      An IS undergraduate who <strong>runs the floor as much as builds it</strong> — coordinating
+      operations, training teams, and shaping AI-powered learning products. The long game:
+      to become a <span class="gold">well-reputed asset manager</span>, trusted to steward other people's capital.
+    </p>
+
+    <div class="stats">
+      <div class="stat reveal"><div class="num">Top 3</div><div class="lbl">Form rank · S.2–S.6</div></div>
+      <div class="stat reveal"><div class="num">40+</div><div class="lbl">Students supported</div></div>
+      <div class="stat reveal"><div class="num">50+</div><div class="lbl">Tutors trained</div></div>
+      <div class="stat reveal"><div class="num">5</div><div class="lbl">Languages</div></div>
+    </div>
+  </section>
+
+  <!-- NORTH STAR (scroll-zoom) -->
+  <section class="northstar" aria-label="Ambition">
+    <div class="ns-inner" id="nsZoom">
+      <div class="ns-eyebrow">The north star</div>
+      <blockquote>Capital is trust, quantified. I'm building toward earning it — <span class="hl">as an asset manager people rely on.</span></blockquote>
+      <p class="ns-sub">Every role and course below is a deliberate step on that path: operations to read risk, finance to price it, data to scale judgment.</p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about reveal">
+    <div class="eyebrow">About</div>
+    <h2 class="title">Operations now, allocation next.</h2>
+    <p>
+      I work where systems meet people. At a tutoring centre I keep classes running, de-escalate
+      complaints in real time, and onboard new tutors — then turn those frontline patterns into
+      <strong>product decisions</strong>. That same instinct for reading risk and allocating limited
+      resources is what draws me to <span class="gold">asset management</span>. I'm sharpening it through
+      HKUST's finance track and the Investment Circle, and I speak five languages, the newest being Russian.
+    </p>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="reveal">
+    <div class="eyebrow">Experience</div>
+    <h2 class="title">Where I've operated</h2>
+    <p class="section-note">Tap any role to open it — full detail inside, with photos coming soon.</p>
+
+    <!-- DCU -->
+    <div class="exp-org">
+      <div class="exp-org-head">
+        <span class="exp-org-name">DCU Limited</span>
+        <span class="exp-org-date">Jun 2025 — Present</span>
+      </div>
+
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 4-5"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">Operations Coordinator</div><div class="role-tag">discipline · scheduling · quality</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Monitored tutor compliance across live classes, flagging performance gaps and recommending fixes before they escalated.</li>
+            <li>Served as primary channel between admin staff, tutors and parents — resolving scheduling conflicts and protecting teaching capacity.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
+
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">Tutor Trainer &amp; Onboarding Lead</div><div class="role-tag">programme design · platform training</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Designed and delivered a structured onboarding programme for 7+ new tutors, built on real student-interaction case studies to cut time-to-readiness.</li>
+            <li>Ran platform training for 50+ tutors and students on ClassIn; resolved critical incidents live to minimise disruption.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
+
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">Part-time Tutor</div><div class="role-tag">HKDSE English · Maths · Chemistry</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Tutored at HKDSE level, specialising in Mainland and local students adapting to Hong Kong exam patterns.</li>
+            <li>Supported 40+ students through curriculum alignment, exam technique and progress tracking.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
+
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">Product Consultant</div><div class="role-tag">AI assessment system · in progress</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Contributing to the preliminary design of an adaptive, AI-powered assessment and practice-paper system for Mainland students transitioning into Hong Kong secondary schools.</li>
+            <li>Acting as liaison between business leadership and the development team to align product requirements with operational needs.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
     </div>
 
-    <audio id="youdao-audio" src=""></audio>
+    <!-- HEBRON -->
+    <div class="exp-org">
+      <div class="exp-org-head">
+        <span class="exp-org-name">Assembly of God Hebron Secondary School</span>
+        <span class="exp-org-date">Oct 2023 — Apr 2025</span>
+      </div>
 
-    <div class="category-section">
-        <div class="category-title">模塊一：基礎音標與自然拼讀</div>
-        <div class="grid-container">
-            <button class="word-btn" onclick="playVoice('cat', 2, '/æ/')">
-                <div class="word-title">Cat <span class="type-badge">美音</span></div>
-                <div class="word-ipa">/æ/ 短母音</div>
-            </button>
-            <button class="word-btn" onclick="playVoice('cat', 1, '/æ/')">
-                <div class="word-title">Cat <span class="type-badge">英音</span></div>
-                <div class="word-ipa">/æ/ 短母音</div>
-            </button>
-            <button class="word-btn" onclick="playVoice('make', 2, '/eɪ/')">
-                <div class="word-title">Make</div>
-                <div class="word-ipa">/eɪ/ 長母音</div>
-            </button>
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">Senior Prefect</div><div class="role-tag">leadership · event operations</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Collaborated with prefects to maintain order during the Athletic Meet.</li>
+            <li>Conducted onboarding training for 5 juniors to bring them up to speed.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
+
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">Vice President, English Society</div><div class="role-tag">engagement · events</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Boosted students' passion for English through weekly "English Friday" events with interactive K-pop &amp; food Kahoot quizzes.</li>
+            <li>Organised 3 Chinese-Zodiac booths at the annual Academic Exhibition Day.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- INVESTMENT CIRCLE -->
+    <div class="exp-org">
+      <div class="exp-org-head">
+        <span class="exp-org-name">Investment Circle, HKUST</span>
+        <span class="exp-org-date">Oct 2025 — Present</span>
+      </div>
+
+      <div class="role-box">
+        <button class="role-head" aria-expanded="false">
+          <span class="role-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M19 9l-5 5-3-3-4 4"/></svg></span>
+          <span class="role-titlewrap"><div class="role-title">General Member</div><div class="role-tag">equities · derivatives · asset mgmt</div></span>
+          <svg class="role-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="role-detail"><div class="rd-inner">
+          <ul>
+            <li>Attended workshops on equity, derivatives and options.</li>
+            <li>Joined the HKFBS × HKIFA Asset Management Masterclass — practical insight into Hong Kong's asset-management industry and its career path, plus networking with senior professionals.</li>
+          </ul>
+          <div class="photo-strip"><div class="photo-slot">add photo<br>&lt;img&gt;</div><div class="photo-slot">add photo<br>&lt;img&gt;</div></div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap" class="reveal">
+    <div class="eyebrow">Learning Roadmap</div>
+    <h2 class="title">Skill tree → in progress</h2>
+    <p class="section-note">A planned path through HKUST, engineered toward asset management. Hover any course to branch out its core topics.</p>
+
+    <div class="phases" id="phases">
+      <div class="phase">
+        <div class="phase-head"><span class="phase-idx">01</span><span class="phase-name">Technical Infrastructure</span><span class="phase-sub">data + code</span></div>
+        <div class="node">
+          <button class="node-head"><span class="node-code">ISOM 3400</span><span class="node-label">Business Applications in Python</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <div class="branches"><div class="inner"><p class="node-desc">Core automation and scripting — turning manual ops into tools.</p><ul class="leaves"><li class="leaf"><span class="lk">01</span>Data structures</li><li class="leaf"><span class="lk">02</span>Pandas &amp; NumPy</li><li class="leaf"><span class="lk">03</span>API integration</li><li class="leaf"><span class="lk">04</span>Workflow automation</li></ul></div></div>
         </div>
-    </div>
-
-    <div class="category-section">
-        <div class="category-title">模塊二：核心詞根詞綴</div>
-        <div class="grid-container">
-            <button class="word-btn" onclick="playVoice('create', 2, '/eɪt/')">
-                <div class="word-title">Create</div>
-                <div class="word-ipa">-ate 動詞後綴 /eɪt/</div>
-            </button>
-            <button class="word-btn" onclick="playVoice('considerate', 2, '/ət/')">
-                <div class="word-title">Considerate</div>
-                <div class="word-ipa">-ate 形容詞後綴 /ət/</div>
-            </button>
-            <button class="word-btn" onclick="playVoice('tradition', 2, '/ʃn/')">
-                <div class="word-title">Tradition</div>
-                <div class="word-ipa">-tion 後綴 /ʃn/</div>
-            </button>
-            <button class="word-btn" onclick="playVoice('consider', 2, '/ə/')">
-                <div class="word-title">Consider</div>
-                <div class="word-ipa">con- 弱化音 /ə/</div>
-            </button>
-            <button class="word-btn" onclick="playVoice('concentrate', 2, '/ɒ/')">
-                <div class="word-title">Concentrate</div>
-                <div class="word-ipa">con- 重讀音 /ɒ/</div>
-            </button>
+        <div class="node">
+          <button class="node-head"><span class="node-code">ISOM 3260</span><span class="node-label">Database Design &amp; Administration</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <div class="branches"><div class="inner"><p class="node-desc">The single source of truth behind every decision.</p><ul class="leaves"><li class="leaf"><span class="lk">01</span>SQL architecture</li><li class="leaf"><span class="lk">02</span>Data modeling</li><li class="leaf"><span class="lk">03</span>System administration</li><li class="leaf"><span class="lk">04</span>Query optimization</li></ul></div></div>
         </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head"><span class="phase-idx">02</span><span class="phase-name">Financial Engine</span><span class="phase-sub">markets + valuation</span></div>
+        <div class="node">
+          <button class="node-head"><span class="node-code">FINA 3103</span><span class="node-label">Intermediate Investments</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <div class="branches"><div class="inner"><p class="node-desc">Portfolio construction and how capital gets allocated.</p><ul class="leaves"><li class="leaf"><span class="lk">01</span>Portfolio theory</li><li class="leaf"><span class="lk">02</span>CAPM model</li><li class="leaf"><span class="lk">03</span>Fixed income</li><li class="leaf"><span class="lk">04</span>Market efficiency</li></ul></div></div>
+        </div>
+        <div class="node">
+          <button class="node-head"><span class="node-code">FINA 4013</span><span class="node-label">Corporate Valuation</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <div class="branches"><div class="inner"><p class="node-desc">The exact metrics investors use to price a business.</p><ul class="leaves"><li class="leaf"><span class="lk">01</span>DCF modeling</li><li class="leaf"><span class="lk">02</span>M&amp;A valuation</li><li class="leaf"><span class="lk">03</span>Financial forecasting</li><li class="leaf"><span class="lk">04</span>Risk assessment</li></ul></div></div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head"><span class="phase-idx">03</span><span class="phase-name">Quant &amp; AI</span><span class="phase-sub">where it converges</span></div>
+        <div class="node">
+          <button class="node-head"><span class="node-code">ACCT 4720</span><span class="node-label">Equity Investment with Machine Learning</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <div class="branches"><div class="inner"><p class="node-desc">From human intuition to data-driven investment strategy.</p><ul class="leaves"><li class="leaf"><span class="lk">01</span>Predictive modeling</li><li class="leaf"><span class="lk">02</span>Factor investing</li><li class="leaf"><span class="lk">03</span>Algorithmic trading</li><li class="leaf"><span class="lk">04</span>Backtesting strategies</li></ul></div></div>
+        </div>
+        <div class="node">
+          <button class="node-head"><span class="node-code">ISOM 4860</span><span class="node-label">Data Analytics in Financial Markets</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <div class="branches"><div class="inner"><p class="node-desc">The synthesis: data science applied to quantitative finance.</p><ul class="leaves"><li class="leaf"><span class="lk">01</span>Quantitative strategy</li><li class="leaf"><span class="lk">02</span>Financial data parsing</li><li class="leaf"><span class="lk">03</span>Risk analytics</li><li class="leaf"><span class="lk">04</span>High-frequency concepts</li></ul></div></div>
+        </div>
+      </div>
     </div>
+    <p class="roadmap-goal">All three tracks converge on one destination → <b>Asset Management</b></p>
+  </section>
 
-    <script>
-        // 調用有道詞典 API 發音
-        function playVoice(word, type, ipa) {
-            // 更新視覺區塊的文字，增加互動感
-            const visualBox = document.getElementById('visual-word');
-            visualBox.innerHTML = `${word}<br><span style="font-size:24px;">${ipa}</span>`;
-            
-            // 組合有道 API 網址 (type 1: 英音, type 2: 美音)
-            const audioUrl = `https://dict.youdao.com/dictvoice?audio=${word}&type=${type}`;
-            
-            // 播放聲音
-            const player = document.getElementById('youdao-audio');
-            player.src = audioUrl;
-            player.play().catch(e => alert("發音讀取失敗，請檢查網路連線。"));
-        }
-    </script>
+  <!-- PROJECTS -->
+  <section id="projects" class="reveal">
+    <div class="eyebrow">Building</div>
+    <h2 class="title">Things I've shipped</h2>
+    <p class="section-note">Real products from real problems. Add your deck or photos below.</p>
 
+    <div class="proj">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4"/></svg>
+        TeamSync
+        <span class="tag">project</span>
+      </h3>
+      <p>A synchronization tool built to eliminate cross-functional scheduling conflicts and streamline collaborative workflows — aimed at the operational bottlenecks academic and enterprise teams hit every day.</p>
+
+      <div class="media-tabs" role="tablist">
+        <button class="media-tab active" data-pane="deck" role="tab">▢ Slides / PPT</button>
+        <button class="media-tab" data-pane="photos" role="tab">▢ Photos</button>
+      </div>
+
+      <div class="media-pane active" data-pane="deck">
+        <div class="deck" id="deckBox">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 17l4-4 3 3 4-5 7 6"/></svg>
+          <div class="mono">Show your presentation</div>
+          <div class="mono" style="color:var(--faint);max-width:400px">Paste a published share link (Google Slides / Canva / Gamma) and it embeds below — or hard-code an <code>&lt;iframe&gt;</code> here.</div>
+          <div class="embed-row">
+            <input id="deckUrl" type="url" placeholder="https://docs.google.com/presentation/d/.../embed" aria-label="Presentation embed URL">
+            <button id="deckGo">Embed</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="media-pane" data-pane="photos">
+        <div class="gallery" id="gallery">
+          <label class="g-add">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15l-5-5L5 21"/><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/></svg>
+            add photos
+            <input id="photoInput" type="file" accept="image/*" multiple hidden>
+          </label>
+        </div>
+        <p class="mono" style="font-family:'JetBrains Mono';font-size:.7rem;color:var(--faint);margin-top:12px">Previews are local. To publish, replace tiles with hosted <code style="background:var(--surface-2);padding:1px 5px;border-radius:4px;color:var(--accent-text)">&lt;img src&gt;</code> tags.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="reveal">
+    <div class="eyebrow">Capabilities</div>
+    <h2 class="title">Toolkit</h2>
+    <p class="section-note">What I bring, and what I'm actively levelling up.</p>
+
+    <div class="skill-grid">
+      <div class="skill-card">
+        <h4>Languages</h4>
+        <div class="lang-row"><span class="name">Mandarin</span><span class="bar"><span class="fill" data-w="100%"></span></span><span class="lvl">native</span></div>
+        <div class="lang-row"><span class="name">English</span><span class="bar"><span class="fill" data-w="92%"></span></span><span class="lvl">fluent</span></div>
+        <div class="lang-row"><span class="name">Cantonese</span><span class="bar"><span class="fill" data-w="92%"></span></span><span class="lvl">fluent</span></div>
+        <div class="lang-row"><span class="name">Teochew</span><span class="bar"><span class="fill" data-w="90%"></span></span><span class="lvl">fluent</span></div>
+        <div class="lang-row"><span class="name">Русский</span><span class="bar"><span class="fill" data-w="28%"></span></span><span class="lvl">learning</span></div>
+      </div>
+
+      <div class="skill-card">
+        <h4>Strengths</h4>
+        <div class="chips" style="margin-bottom:20px">
+          <span class="chip">Operations coordination</span><span class="chip">Team onboarding</span><span class="chip">Stakeholder liaison</span><span class="chip">Conflict de-escalation</span><span class="chip">Product requirements</span>
+        </div>
+        <h4>Levelling up</h4>
+        <div class="chips"><span class="chip">Python</span><span class="chip">SQL</span><span class="chip">Financial modeling</span><span class="chip">Portfolio analytics</span></div>
+        <h4 style="margin-top:20px">Off the clock</h4>
+        <div class="chips"><span class="chip">Rubik's cube · sub-18</span><span class="chip">Music</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact reveal">
+    <div class="eyebrow" style="justify-content:center">Get in touch</div>
+    <h2>Let's build something that compounds.</h2>
+    <p>Open to internships, product collaborations, or talking markets, ops, and the road to asset management.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:xllend39@gmail.com"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>xllend39@gmail.com</a>
+      <a class="btn btn-ghost" href="https://wa.me/85256913230" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>+852 5691 3230</a>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 Xu Pok Yuen, Max · Building toward asset management · Hong Kong</footer>
+
+<script>
+// ── theme toggle (in-memory; add localStorage when self-hosting) ──
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const html=document.documentElement;
+  html.setAttribute('data-theme', html.getAttribute('data-theme')==='dark'?'light':'dark');
+});
+
+// ── experience role boxes (tap to open) ──
+document.querySelectorAll('.role-head').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const box=btn.closest('.role-box');
+    const open=box.getAttribute('data-open')==='true';
+    box.setAttribute('data-open',String(!open));
+    btn.setAttribute('aria-expanded',String(!open));
+  });
+});
+
+// ── roadmap: hover/focus opens via CSS; tap pins it open for touch ──
+document.querySelectorAll('#phases .node').forEach(node=>{
+  node.querySelector('.node-head').addEventListener('click',()=>{
+    node.classList.toggle('pinned');
+  });
+});
+
+// ── projects: media tabs + deck embed + local photo preview ──
+document.querySelectorAll('.media-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const proj=tab.closest('.proj'); const name=tab.dataset.pane;
+    proj.querySelectorAll('.media-tab').forEach(t=>t.classList.toggle('active',t===tab));
+    proj.querySelectorAll('.media-pane').forEach(p=>p.classList.toggle('active',p.dataset.pane===name));
+  });
+});
+document.getElementById('deckGo').addEventListener('click',()=>{
+  const url=document.getElementById('deckUrl').value.trim(); if(!url) return;
+  const box=document.getElementById('deckBox');
+  box.innerHTML='';
+  const f=document.createElement('iframe'); f.src=url; f.allowFullscreen=true; box.appendChild(f);
+});
+document.getElementById('photoInput').addEventListener('change',e=>{
+  const g=document.getElementById('gallery'); const addBtn=g.querySelector('.g-add');
+  [...e.target.files].forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{ const t=document.createElement('div'); t.className='g-tile';
+      const img=document.createElement('img'); img.src=ev.target.result; img.alt='TeamSync photo';
+      t.appendChild(img); g.insertBefore(t,addBtn); };
+    r.readAsDataURL(file);
+  });
+});
+
+// ── active-section nav ──
+const navLinks=[...document.querySelectorAll('nav.links a')];
+const linkFor=id=>navLinks.find(a=>a.getAttribute('href')==='#'+id);
+document.querySelectorAll('main section[id]').forEach(s=>{
+  new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ navLinks.forEach(a=>a.classList.remove('active')); const l=linkFor(e.target.id); if(l)l.classList.add('active'); }}),
+    {rootMargin:'-45% 0px -50% 0px'}).observe(s);
+});
+
+// ── reveal + zoom-in on scroll ──
+const rev=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); rev.unobserve(e.target);} }),{threshold:.12});
+document.querySelectorAll('.reveal,.zoom-in').forEach(el=>rev.observe(el));
+
+// ── language bars ──
+const sk=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w); sk.unobserve(e.target);} }),{threshold:.3});
+const skEl=document.getElementById('skills'); if(skEl) sk.observe(skEl);
+
+// ── scroll-linked zoom on the North Star statement ──
+const ns=document.getElementById('nsZoom');
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let ticking=false;
+function zoomNS(){
+  if(reduce||!ns) return;
+  const r=ns.getBoundingClientRect(); const vh=window.innerHeight;
+  const center=r.top+r.height/2; const dist=Math.abs(center-vh/2)/(vh/2); // 0 at center, 1 far
+  const scale=Math.max(.9, 1.06 - dist*0.16);
+  ns.style.transform='scale('+scale.toFixed(3)+')';
+  ns.style.opacity=Math.max(.45,1-dist*0.7).toFixed(2);
+  ticking=false;
+}
+window.addEventListener('scroll',()=>{ if(!ticking){ requestAnimationFrame(zoomNS); ticking=true; } },{passive:true});
+window.addEventListener('resize',zoomNS); zoomNS();
+</script>
 </body>
 </html>
