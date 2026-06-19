@@ -1,96 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語發音影片點讀機 2.0</title>
+    <title>英語發音點讀機 (離線版)</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { color: #2c3e50; text-align: center; }
+        
+        /* 影片播放器樣式 */
         .video-container {
-            margin: 20px auto; max-width: 560px; border-radius: 10px; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); background-color: #000;
+            background-color: #000; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); margin: 20px auto; max-width: 480px;
         }
-        iframe { width: 100%; height: 315px; border: none; }
+        video { width: 100%; height: auto; display: block; }
         
-        /* 單字卡片列表樣式 */
-        .word-list { display: flex; flex-direction: column; gap: 15px; max-width: 560px; margin: 0 auto; }
-        .word-card {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+        /* 分類區塊樣式 */
+        .category-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .category-title { border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px; color: #34495e; font-size: 20px; font-weight: bold; }
         
-        /* 點擊單字的互動樣式 */
-        .word-text {
-            font-size: 24px; font-weight: bold; color: #2c3e50; cursor: pointer;
-            transition: color 0.2s; display: flex; align-items: center; gap: 10px;
-            user-select: none;
-        }
-        .word-text:hover { color: #3498db; }
-        .word-text:active { transform: scale(0.95); }
-        .phonetic { font-size: 16px; color: #7f8c8d; font-weight: normal; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
         
-        /* 影片按鈕樣式 */
-        button {
-            background-color: #e74c3c; color: white; border: none; padding: 10px 15px;
-            font-size: 16px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: bold;
+        /* 單字按鈕樣式 */
+        .word-btn {
+            background-color: #f1f3f5; border: 2px solid #dee2e6; border-radius: 8px;
+            padding: 12px; text-align: left; cursor: pointer; transition: all 0.2s ease;
         }
-        button:hover { background-color: #c0392b; }
-        .tip { color: #e67e22; font-size: 16px; margin-bottom: 20px; font-weight: bold;}
+        .word-btn:hover { background-color: #e2e6ea; border-color: #adb5bd; transform: translateY(-2px); }
+        .word-title { font-size: 18px; font-weight: bold; color: #0056b3; margin-bottom: 4px; }
+        .word-ipa { font-size: 14px; color: #6c757d; font-family: 'Courier New', Courier, monospace; }
+        
+        /* 目前播放狀態提示 */
+        #now-playing { text-align: center; font-size: 18px; font-weight: bold; color: #e74c3c; margin: 15px 0; min-height: 27px; }
     </style>
 </head>
 <body>
 
-    <h1>📺 英語口型影片點讀機 2.0</h1>
-    <p class="tip">💡 點擊「英文單字」可直接聽發音，點擊「觀看口型」可看真人影片</p>
+    <h1>👄 英語發音點讀機</h1>
+    <div id="now-playing">請選擇下方單字觀看口型影片</div>
 
     <div class="video-container">
-        <iframe id="yt-player" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <video id="local-player" playsinline>
+            你的瀏覽器不支援 HTML5 影片。
+        </video>
     </div>
 
-    <div class="word-list">
-        <div class="word-card">
-            <div class="word-text" onclick="speakWord('cat', 'en-US')">
-                🔊 Cat <span class="phonetic">/æ/ (美音)</span>
-            </div>
-            <button onclick="playVideo('KRzEZiXW4CA', 0, 5)">🎥 觀看口型</button>
-        </div>
-
-        <div class="word-card">
-            <div class="word-text" onclick="speakWord('cat', 'en-GB')">
-                🔊 Cat <span class="phonetic">/æ/ (英音)</span>
-            </div>
-            <button onclick="playVideo('IctwlBDPy-Y', 0, 5)">🎥 觀看口型</button>
-        </div>
-
-        <div class="word-card">
-            <div class="word-text" onclick="speakWord('create', 'en-US')">
-                🔊 Create <span class="phonetic">/eɪt/</span>
-            </div>
-            <button onclick="playVideo('_kVi2rD2HZ8', 0, 6)">🎥 觀看口型</button>
+    <div class="category-section">
+        <div class="category-title">模塊一：基礎音標與自然拼讀</div>
+        <div class="grid-container">
+            <button class="word-btn" onclick="playLocalVideo('videos/cat.mp4', 'Cat /æ/')">
+                <div class="word-title">Cat</div>
+                <div class="word-ipa">/æ/ 短母音</div>
+            </button>
+            <button class="word-btn" onclick="playLocalVideo('videos/make.mp4', 'Make /eɪ/')">
+                <div class="word-title">Make</div>
+                <div class="word-ipa">/eɪ/ 長母音</div>
+            </button>
         </div>
     </div>
 
-    <script>
-        // 功能 1：點擊單字，使用瀏覽器內建 AI 語音引擎直接發音
-        function speakWord(text, lang) {
-            // 取消目前正在唸的聲音（防止連點重疊）
-            window.speechSynthesis.cancel(); 
-            
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang; // 設定口音：'en-US' 美音, 'en-GB' 英音
-            utterance.rate = 0.8;  // 語速設定為 0.8 倍，讓學生聽得更清楚
-            
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // 功能 2：點擊按鈕，載入 YouTube 影片並精準跳轉秒數
-        function playVideo(videoId, start, end) {
-            // 加入 autoplay=1 自動播放
-            let embedUrl = `https://www.youtube.com/embed/${videoId}?start=${start}&end=${end}&autoplay=1`;
-            document.getElementById('yt-player').src = embedUrl;
-        }
-    </script>
-
-</body>
-</html>
+    <div class="category-section">
+        <div class="category-title">模塊二：核心詞根詞綴</div>
+        <div class="grid-container">
+            <button class="word-btn" onclick="playLocalVideo('videos/create.mp4', 'Create /eɪt/')">
+                <div class="word-title">Create</div>
+                <div class="word-ipa">-ate 動詞後綴 /eɪt/</div>
+            </button>
+            <button class="word-btn" onclick="playLocalVideo('videos/considerate.mp4', 'Considerate /ət/')">
+                <div class="word-title">Considerate</div>
+                <div class="word-ipa">-ate 形容詞後綴 /ət/</div>
+            </button>
+            <button class="word-btn" onclick="playLocalVideo('videos/tradition.mp4', 'Tradition /ʃn/')">
+                <div class="word-title">Tradition</div>
+                <div class="
