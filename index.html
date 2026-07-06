@@ -1,246 +1,116 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIAS 報告頁 Prototype</title>
+  <title>KongU 錄取案例 - Prototype</title>
   <style>
-    *{box-sizing:border-box}
     :root{
+      --bg:#f8f4fb;
+      --ink:#121426;
+      --muted:#8f8b99;
       --purple:#8b5cf6;
-      --purple2:#6d5dfc;
-      --blue:#5d7df8;
-      --ink:#111827;
-      --muted:#8b8f9c;
-      --light:#f8f7ff;
-      --card:#fff;
-      --line:#eef0f5;
-      --green:#19b59e;
-      --red:#ff5b73;
-      --yellow:#ffb020;
+      --purple2:#6f6dfb;
+      --blue:#5a87ff;
+      --red:#ff3d61;
+      --pink:#fff0f4;
+      --card:#ffffff;
+      --line:#f0ebf6;
+      --shadow:0 12px 30px rgba(82,62,140,.12);
     }
-    body{
-      margin:0;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#eceef6;
-      font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","PingFang TC","Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;
-      color:var(--ink);
-    }
-    .device{
-      width:390px;
-      height:846px;
-      background:#fff;
-      overflow:hidden;
-      border-radius:34px;
-      box-shadow:0 28px 80px rgba(28,32,56,.22),0 0 0 1px rgba(0,0,0,.05);
-      position:relative;
-    }
-    .screen{
-      height:100%;
-      overflow-y:auto;
-      padding-bottom:88px;
-      background:linear-gradient(180deg,#f0eaff 0%,#fbfbff 22%,#f7f8fb 100%);
-      scrollbar-width:none;
-    }
-    .screen::-webkit-scrollbar{display:none}
-    .status{
-      height:48px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 22px;
-      font-weight:800;
-      font-size:17px;
-    }
-    .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:124px;height:34px;background:#000;border-radius:20px}
-    .signals{display:flex;align-items:center;gap:6px;font-size:13px}
-    .topbar{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px 4px}
-    .topbar .back{font-size:22px;font-weight:900;line-height:1;color:#111827}
-    .topbar h1{font-size:20px;line-height:1;margin:0;font-weight:900;letter-spacing:.5px}
-    .capsule{width:84px;height:36px;border:1px solid rgba(0,0,0,.08);border-radius:19px;background:rgba(255,255,255,.82);display:flex;align-items:center;justify-content:space-around;box-shadow:0 4px 14px rgba(0,0,0,.04)}
-    .dots{font-size:22px;letter-spacing:1px;margin-top:-4px}.circle{width:21px;height:21px;border-radius:50%;border:5px solid #111;box-shadow:inset 0 0 0 3px #fff}
-
-    .hero{margin:10px 16px 14px;padding:18px 16px;border-radius:24px;background:linear-gradient(135deg,#efe7ff 0%,#fff3fa 52%,#ecf6ff 100%);box-shadow:0 12px 30px rgba(128,100,255,.14);position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.9)}
-    .hero:after{content:"";position:absolute;right:-28px;top:-25px;width:128px;height:128px;border-radius:40px;background:linear-gradient(135deg,rgba(141,91,255,.25),rgba(92,125,248,.15));transform:rotate(20deg)}
-    .tag{display:inline-flex;align-items:center;gap:5px;background:#fff;color:#7b61ff;border:1px solid #eee6ff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;box-shadow:0 5px 14px rgba(107,93,252,.12)}
-    .hero h2{font-size:25px;line-height:1.18;margin:12px 0 6px;font-weight:900;letter-spacing:-.5px;position:relative;z-index:1}
-    .hero p{font-size:13px;color:#646b7b;margin:0;line-height:1.55;position:relative;z-index:1}
-    .quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;position:relative;z-index:1}
-    .quick .mini{background:#fff;border-radius:18px;padding:10px 8px;border:1px solid #f0ecff;box-shadow:0 8px 20px rgba(111,102,255,.09)}
-    .mini .label{font-size:11px;color:#8c93a2;font-weight:700}.mini .value{font-size:18px;font-weight:900;margin-top:4px}.mini .value.purple{color:#7157ff}.mini .value.green{color:#0ca58e}.mini .value.orange{color:#d97706}
-
-    .tabs{margin:0 16px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;background:#fff;padding:6px;border-radius:18px;box-shadow:0 8px 22px rgba(40,45,66,.06)}
-    .tab{border:none;border-radius:14px;background:transparent;padding:9px 2px;font-size:13px;color:#7a8191;font-weight:800;cursor:pointer}
-    .tab.active{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;box-shadow:0 7px 16px rgba(111,102,255,.25)}
-
-    .content{display:none}.content.active{display:block}
-    .card{margin:12px 16px;background:var(--card);border-radius:22px;padding:16px;box-shadow:0 9px 24px rgba(29,35,54,.07);border:1px solid rgba(242,243,248,.9)}
-    .card-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .card-title h3{font-size:16px;margin:0;font-weight:900;letter-spacing:-.2px}.sub{font-size:12px;color:#8b92a2;font-weight:700}
-    .pill{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#f2edff;color:#704df6;border:1px solid #e5dcff}.pill.green{background:#e7fbf7;color:#08967f;border-color:#bdf1e7}.pill.red{background:#fff0f3;color:#ff5068;border-color:#ffd6dd}.pill.blue{background:#edf4ff;color:#4777ff;border-color:#d9e7ff}.pill.yellow{background:#fff7e3;color:#a36a00;border-color:#ffe7ad}
-
-    .band-card{background:linear-gradient(135deg,#ffffff 0%,#f8f4ff 100%);border:1px solid #ebe3ff}
-    .band-main{display:flex;gap:14px;align-items:center}
-    .badge-big{width:82px;height:82px;border-radius:24px;background:linear-gradient(135deg,#8b5cf6,#5d7df8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 12px 24px rgba(109,93,252,.28);flex:none}
-    .badge-big .score{font-size:22px;font-weight:950}.badge-big .small{font-size:11px;font-weight:700;opacity:.9}
-    .band-info{flex:1}.band-info h3{font-size:21px;margin:0 0 6px;font-weight:950}.band-info p{font-size:13px;color:#606878;line-height:1.45;margin:0}.percentile{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
-    .slider-wrap{margin-top:16px;background:#fff;border-radius:16px;padding:12px;border:1px solid #f1eff8}.slider-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#7c8393;font-weight:800;margin-bottom:8px}input[type=range]{width:100%;accent-color:#7b61ff}
-    .formula-note{margin-top:9px;font-size:11px;line-height:1.35;color:#8c93a2;background:#fff;border:1px dashed #e8e3ff;border-radius:12px;padding:8px 10px}
-
-    .level{margin-top:10px}.rail{height:10px;background:#e9ebf0;border-radius:999px;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:2px}.seg{border-radius:999px;background:#e8ebf0}.seg.done{background:#9cebdd}.seg.now{background:#755cff}.level-labels{display:grid;grid-template-columns:repeat(7,1fr);font-size:10px;color:#9aa1af;text-align:center;margin-top:6px;font-weight:800}.marker{position:relative;height:22px}.tri{position:absolute;left:48%;top:2px;transform:translateX(-50%);color:#755cff;font-size:13px}.marker span{position:absolute;left:48%;top:12px;transform:translateX(-50%);font-size:10px;color:#755cff;font-weight:900;white-space:nowrap}
-
-    .bars{display:flex;flex-direction:column;gap:12px}.bar-row{cursor:pointer}.bar-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px}.bar-name{font-size:14px;font-weight:850;color:#3b4455}.bar-score{font-size:13px;font-weight:950;color:#6d4dff}.track{height:9px;border-radius:999px;background:#eef0f5;overflow:hidden}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#5d7df8)}.fill.red{background:linear-gradient(90deg,#ff6a82,#ff9aa8)}.fill.green{background:linear-gradient(90deg,#21c7a8,#7debd9)}.hint-box{display:none;margin-top:10px;background:#fbfaff;border:1px solid #eee9ff;border-radius:14px;padding:10px;color:#656b78;font-size:12.5px;line-height:1.45}.bar-row.open .hint-box{display:block}
-
-    .route{display:grid;grid-template-columns:1fr;gap:10px}.route-item{display:flex;gap:10px;align-items:flex-start;background:#fbfbff;border:1px solid #eef0f6;border-radius:16px;padding:11px}.route-num{width:28px;height:28px;border-radius:10px;background:#f0ebff;color:#6b52ff;display:flex;align-items:center;justify-content:center;font-weight:950}.route-item b{font-size:14px}.route-item p{font-size:12px;color:#777f8f;margin:3px 0 0;line-height:1.4}
-
-    .school{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid #f0f1f5;cursor:pointer}.school:first-of-type{border-top:0;padding-top:0}.rank{width:42px;height:42px;border-radius:16px;background:linear-gradient(135deg,#8b5cf6,#5d7df8);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;box-shadow:0 8px 18px rgba(107,93,252,.24)}.s-info{flex:1}.s-info h4{margin:0 0 5px;font-size:15px;font-weight:950}.s-tags{display:flex;gap:5px;flex-wrap:wrap}.s-tags span{font-size:10px;font-weight:800;background:#f5f6fa;border-radius:7px;padding:3px 6px;color:#6a7282}.match{font-size:20px;font-weight:950;color:#12a38d;text-align:right}.match small{display:block;font-size:10px;color:#a0a6b2;margin-top:1px}.chev{font-size:20px;color:#a6adba;margin-left:2px}
-
-    .cta{margin:14px 16px 6px;background:linear-gradient(135deg,#8b5cf6,#5d7df8);border-radius:20px;color:#fff;padding:15px 16px;box-shadow:0 12px 26px rgba(107,93,252,.28)}.cta h3{margin:0 0 4px;font-size:17px}.cta p{margin:0 0 12px;font-size:12px;opacity:.9;line-height:1.45}.cta button{width:100%;border:0;background:#fff;color:#6f55ff;border-radius:15px;padding:12px;font-weight:950;font-size:15px}
-
-    .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:76px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-top:1px solid #f0f0f3;display:grid;grid-template-columns:repeat(4,1fr);padding-top:8px}.navitem{display:flex;flex-direction:column;align-items:center;gap:4px;color:#7a8191;font-size:11px;font-weight:800}.navitem.active{color:#8b5cf6}.nav-ico{font-size:22px}.homebar{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:110px;height:4px;background:#111;border-radius:4px}
-
-    .modal-mask{position:absolute;inset:0;background:rgba(19,24,36,.45);display:none;align-items:flex-end;z-index:10}.modal-mask.show{display:flex}.sheet{width:100%;max-height:78%;overflow-y:auto;background:#fff;border-radius:28px 28px 0 0;padding:10px 18px 24px;box-shadow:0 -18px 45px rgba(0,0,0,.2);animation:rise .2s ease-out}.handle{width:44px;height:5px;background:#d9dce4;border-radius:99px;margin:0 auto 12px}.sheet-head{display:flex;align-items:flex-start;gap:12px}.sheet h3{font-size:19px;margin:0 0 5px;font-weight:950}.sheet p{font-size:13px;color:#6c7483;line-height:1.48}.close{margin-left:auto;border:0;background:#f4f5f8;border-radius:50%;width:30px;height:30px;font-size:18px;color:#6b7280}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.detail{background:#f8f9fc;border:1px solid #eef0f5;border-radius:14px;padding:10px}.detail .k{font-size:11px;color:#9aa1af;font-weight:800}.detail .v{font-size:13px;margin-top:4px;font-weight:900;color:#243044}.why{background:#f7f3ff;border:1px solid #e8dcff;border-radius:16px;padding:12px;margin-top:10px}.why b{font-size:13px}.why ul{margin:8px 0 0 18px;padding:0;font-size:12.5px;color:#636b78;line-height:1.6}.dim{margin-top:12px}.dim-row{display:flex;align-items:center;gap:10px;margin:9px 0}.dim-row span:first-child{width:78px;font-size:12px;color:#5f6878;font-weight:800}.mini-track{height:7px;background:#edf0f5;border-radius:99px;flex:1}.mini-fill{height:100%;background:linear-gradient(90deg,#12c6a7,#8b5cf6);border-radius:99px}.dim-row span:last-child{width:36px;text-align:right;font-size:12px;font-weight:950;color:#0c9b86}@keyframes rise{from{transform:translateY(40px);opacity:.7}to{transform:translateY(0);opacity:1}}
-
-    @media(max-height:850px){body{align-items:flex-start;padding-top:10px}.device{transform:scale(.92);transform-origin:top center}}
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#f7efff 0%,#fff7f3 45%,#f8f4fb 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","PingFang SC","Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+    .phone{width:447px;max-width:100%;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#faf4ff 0%,#fff 30%,#f8f4fb 100%);position:relative;overflow:hidden;padding-bottom:96px;}
+    .status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 42px;font-weight:800;color:#0b1020}
+    .island{position:absolute;left:50%;transform:translateX(-50%);top:16px;width:118px;height:32px;border-radius:999px;background:#000}
+    .icons{display:flex;gap:6px;align-items:center;font-size:13px}
+    .nav{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 24px;}
+    .brand{display:flex;align-items:flex-end;gap:12px}
+    .brand b{font-size:25px;letter-spacing:-.02em}
+    .brand span{font-size:13px;color:#25223a;transform:translateY(-3px)}
+    .more{height:34px;border-radius:999px;background:rgba(255,255,255,.75);box-shadow:0 8px 18px rgba(66,51,105,.1);display:flex;align-items:center;gap:14px;padding:0 14px;font-size:19px}
+    .hero{margin:18px 19px 22px;border-radius:22px;padding:22px 18px 19px;background:radial-gradient(circle at 78% 24%,rgba(255,255,255,.85),rgba(255,255,255,0) 34%),linear-gradient(135deg,#f5eaff,#fff1f1);box-shadow:var(--shadow);position:relative;overflow:hidden;}
+    .hero:after{content:"";position:absolute;right:-34px;top:18px;width:150px;height:150px;background:linear-gradient(135deg,#9b7cff,#4e83ff);border-radius:42% 58% 48% 52%;opacity:.16;}
+    .hero h1{font-size:28px;line-height:1.12;margin:0 120px 8px 0;font-weight:950;letter-spacing:-.02em;}
+    .hero .sub{color:#8c6cff;font-weight:700;margin-bottom:14px;font-size:14px}
+    .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;width:230px;position:relative;z-index:1}
+    .check{font-size:13px;color:#54506a;display:flex;gap:6px;align-items:center;white-space:nowrap}
+    .check i{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;background:#efe8ff;color:var(--purple);font-style:normal;font-size:11px;font-weight:900}
+    .boy{position:absolute;right:18px;top:48px;width:112px;height:152px;z-index:2}
+    .boy .head{width:52px;height:52px;background:#ffd4af;border-radius:50%;margin:0 auto;position:relative}
+    .boy .hair{position:absolute;left:5px;top:-3px;width:43px;height:19px;background:#17223c;border-radius:20px 20px 8px 8px;transform:rotate(-5deg)}
+    .boy .glass{position:absolute;left:8px;top:22px;width:36px;height:12px;border:3px solid #56a4ff;border-radius:8px}
+    .boy .body{width:82px;height:92px;border-radius:34px 34px 18px 18px;background:linear-gradient(180deg,#bfe9ff,#68a5ff);margin:-1px auto 0;box-shadow:inset 0 -16px 0 rgba(255,255,255,.22)}
+    .btn-main{margin-top:22px;height:64px;border-radius:16px;background:linear-gradient(135deg,#9d72ff,#5b82ff);color:#fff;display:grid;place-items:center;text-align:center;box-shadow:0 12px 24px rgba(111,109,251,.24);font-weight:900;font-size:18px}
+    .btn-main small{display:block;font-size:11px;font-weight:600;margin-top:2px;opacity:.9}
+    .quick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 19px 26px}
+    .quick-card{height:98px;border-radius:16px;background:#fff;box-shadow:var(--shadow);padding:20px 18px;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.8)}
+    .quick-card:nth-child(1){background:linear-gradient(135deg,#eef4ff,#fff2fb)}
+    .quick-card:nth-child(2){background:linear-gradient(135deg,#fff1e9,#fff8ef)}
+    .quick h3{margin:0 0 5px;font-size:17px}
+    .quick p{margin:0;color:#8e8797;font-size:12px}
+    .bubble{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:#fff;box-shadow:0 8px 18px rgba(106,83,180,.14)}
+    .title-row{display:flex;align-items:center;justify-content:space-between;margin:0 19px 12px}
+    .title-row h2{margin:0;font-size:20px;letter-spacing:-.01em}
+    .title-row a{font-size:13px;color:#9b96a5;text-decoration:none}
+    .case-window{margin:0 19px 24px;background:linear-gradient(135deg,#f0e9ff,#fff1ed);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);position:relative;padding:20px 18px 11px;text-decoration:none;color:inherit;display:block;}
+    .case-window:hover{transform:translateY(-1px)}
+    .thumb{position:absolute;right:32px;top:0;font-size:70px;opacity:.1;transform:rotate(-10deg)}
+    .ribbon{position:absolute;right:0;top:0;width:55px;height:68px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:18px;letter-spacing:.04em}
+    .ribbon:after{content:"";position:absolute;bottom:-13px;left:0;width:0;height:0;border-left:27.5px solid transparent;border-right:27.5px solid transparent;border-top:13px solid var(--red)}
+    .case-title{position:relative;z-index:1;margin:0 60px 8px 0;font-size:18px;line-height:1.25;font-weight:900;color:#36334d}
+    .case-title em{font-style:normal;color:#7d4dff}
+    .case-sub{position:relative;z-index:1;margin:0 60px 16px 0;color:#8f8b99;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .case-card{background:#fff;border-radius:10px;min-height:96px;display:flex;align-items:center;gap:15px;padding:15px 17px;position:relative;z-index:1;box-shadow:0 4px 16px rgba(99,78,155,.07)}
+    .logo{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#fff 38%,#eaf5ff 39%);border:2px solid #80a4e9;display:grid;place-items:center;color:#4d6dcf;font-weight:950;font-size:19px;flex:0 0 auto}
+    .school{margin:0 0 8px;font-weight:900;font-size:14px;line-height:1.25}
+    .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+    .pill{font-size:11px;font-weight:800;border-radius:5px;padding:4px 6px;color:#8b72ff;background:#f0ebff}
+    .pill.red{color:#ff5b6f;background:#fff0f2}
+    .date{font-size:12px;color:#9b96a5}
+    .dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+    .dot{width:6px;height:6px;border-radius:50%;background:#e2dcef}.dot.active{background:#8b5cf6}
+    .consult{margin:0 19px 26px;height:54px;border-radius:14px;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;padding:0 16px;gap:10px;color:#6f6878;font-size:13px}
+    .consult b{color:#8b5cf6;font-size:17px;line-height:.95}.consult .tag{background:#8b5cf6;color:#fff;padding:3px 8px;border-radius:6px;font-weight:900}
+    .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:447px;max-width:100%;height:74px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid #f0edf6;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;z-index:20}
+    .tab{text-align:center;color:#6f7487;font-size:11px;text-decoration:none}.tab i{display:block;font-size:23px;margin-bottom:3px}.tab.active{color:#8b5cf6;font-weight:900}
+    .float{position:absolute;right:18px;top:790px;border-radius:22px;background:#fff;box-shadow:0 10px 24px rgba(79,65,120,.15);padding:7px 10px;text-align:center;font-size:12px;color:#5b5366;font-weight:800;z-index:5}
+    .float:before{content:"•••";display:block;margin:0 auto 2px;width:32px;height:22px;border-radius:999px;background:#8e72ff;color:#fff;line-height:13px;font-size:22px}
+    @media(max-width:460px){.phone{width:100%}.bottom{width:100%}}
   </style>
 </head>
 <body>
-  <div class="device">
-    <div class="island"></div>
-    <div class="screen">
-      <div class="status"><span>9:41</span><span class="signals">▮▮▮ ᯤ 🔋</span></div>
-      <div class="topbar"><div class="back">‹</div><h1>能力報告</h1><div class="capsule"><span class="dots">•••</span><span class="circle"></span></div></div>
-
-      <section class="hero">
-        <span class="tag">✨ AIAS 初步測評</span>
-        <h2>Emily 的香港同級能力定位</h2>
-        <p>根據本次短測，AIAS 先估算學生在香港同級中的 Banding 能力與學習提升路線。</p>
-        <div class="quick">
-          <div class="mini"><div class="label">英文分數</div><div class="value purple" id="scoreLabel">76%</div></div>
-          <div class="mini"><div class="label">能力定位</div><div class="value green" id="bandLabelMini">Band 1C</div></div>
-          <div class="mini"><div class="label">香港排名</div><div class="value orange" id="topLabelMini">前 26.7%</div></div>
-        </div>
-      </section>
-
-      <div class="tabs">
-        <button class="tab active" data-tab="passport">能力護照</button>
-        <button class="tab" data-tab="growth">提升路線</button>
-        <button class="tab" data-tab="schools">推薦學校</button>
+  <main class="phone">
+    <div class="status"><span>9:41</span><div class="island"></div><span class="icons">▮▮▮  Wi‑Fi  ▰</span></div>
+    <div class="nav"><div class="brand"><b>KongU</b><span>小一在讀 ▾</span></div><div class="more">••• ◎</div></div>
+    <section class="hero">
+      <h1>港校智能測評助手</h1>
+      <div class="sub">9000+ 真實升學案例 · 28 年升學服務經驗</div>
+      <div class="checks">
+        <span class="check"><i>✓</i>科學測評</span><span class="check"><i>✓</i>專業分析</span>
+        <span class="check"><i>✓</i>擇校建議</span><span class="check"><i>✓</i>學習規劃</span>
       </div>
-
-      <main id="passport" class="content active">
-        <section class="card band-card">
-          <div class="band-main">
-            <div class="badge-big"><div class="score" id="bandBadge">1C</div><div class="small">Hong Kong Band</div></div>
-            <div class="band-info">
-              <h3 id="bandTitle">Band 1C 能力</h3>
-              <p id="bandDesc">約屬香港同級前 26.7%，即超越約 73.3% 香港同級學生。英文已進入 Band 1 邊緣能力，但 Grammar 和 Vocabulary 仍需鞏固。</p>
-              <div class="percentile"><span class="pill green" id="pctPill">前 26.7%</span><span class="pill yellow" id="exceedPill">超越 73.3%</span><span class="pill blue">短測估算</span></div>
-            </div>
-          </div>
-          <div class="slider-wrap">
-            <div class="slider-row"><span>互動調整英文得分</span><b id="sliderScore">76%</b></div>
-            <input id="scoreSlider" type="range" min="30" max="98" value="76" step="0.1" />
-            <div class="formula-note">排名換算：70% ≈ 香港同級前 33.3%；分數每提升 1%，相對排名約前進 1.1 個百分點。日後可按真實樣本數據更新。</div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-title"><h3>估計年級水平</h3><span class="sub">目標：穩定 S1</span></div>
-          <div class="level">
-            <div class="rail"><div class="seg done"></div><div class="seg done"></div><div class="seg done"></div><div class="seg now"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div></div>
-            <div class="level-labels"><span>P4</span><span>P5</span><span>P6</span><span>S1</span><span>S2</span><span>S3</span><span>S4</span></div>
-            <div class="marker"><div class="tri">▲</div><span>目前估計</span></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-title"><h3>英文類別分析</h3><span class="sub">點擊查看建議</span></div>
-          <div class="bars">
-            <div class="bar-row" onclick="toggleBar(this)"><div class="bar-head"><span class="bar-name">Reading Comprehension</span><span class="bar-score">80% (4/5)</span></div><div class="track"><div class="fill green" style="width:80%"></div></div><div class="hint-box">能處理直接資料及基本推論題。下一步可加入 reference / summary cloze 訓練。</div></div>
-            <div class="bar-row" onclick="toggleBar(this)"><div class="bar-head"><span class="bar-name">Grammar</span><span class="bar-score">60% (3/5)</span></div><div class="track"><div class="fill" style="width:60%"></div></div><div class="hint-box">主要需要補句子結構、時態及常見文法轉換。建議先做 6–8 小時基礎訓練。</div></div>
-            <div class="bar-row" onclick="toggleBar(this)"><div class="bar-head"><span class="bar-name">Vocabulary</span><span class="bar-score">50% (2/4)</span></div><div class="track"><div class="fill red" style="width:50%"></div></div><div class="hint-box">詞彙量影響閱讀速度。建議用香港校內常見 text types 建立主題詞庫。</div></div>
-          </div>
-        </section>
-      </main>
-
-      <main id="growth" class="content">
-        <section class="card">
-          <div class="card-title"><h3>AIAS 提升時數估算</h3><span class="pill yellow">初步估算</span></div>
-          <div class="route">
-            <div class="route-item"><div class="route-num">1</div><div><b>穩定 Band 1C</b><p>約 8–12 小時：補 Grammar 基礎、常見句型及核心詞彙。</p></div></div>
-            <div class="route-item"><div class="route-num">2</div><div><b>衝 Band 1B</b><p>約 18–28 小時：閱讀推論、summary cloze、reference 題型訓練。</p></div></div>
-            <div class="route-item"><div class="route-num">3</div><div><b>衝 Band 1A</b><p>約 35+ 小時：需要 full-length assessment 後制定進階方案。</p></div></div>
-          </div>
-        </section>
-        <section class="cta"><h3>建議完成完整測評</h3><p>短測只能初步定位。45–60 分鐘 full-length assessment 可生成更準確的 sub-banding、錯題標籤及補習方案。</p><button>預約完整測評</button></section>
-      </main>
-
-      <main id="schools" class="content">
-        <section class="card">
-          <div class="card-title"><h3>Top 3 學校方向</h3><span class="sub">點擊查看詳情</span></div>
-          <div class="school" onclick="openSchool(0)"><div class="rank">#1</div><div class="s-info"><h4>中華基督教會桂華山中學</h4><div class="s-tags"><span>港島</span><span>資助</span><span>合理目標</span></div></div><div class="match">88%<small>匹配</small></div><div class="chev">›</div></div>
-          <div class="school" onclick="openSchool(1)"><div class="rank">#2</div><div class="s-info"><h4>聖士提反堂中學</h4><div class="s-tags"><span>港島</span><span>英文需提升</span><span>挑戰</span></div></div><div class="match">84%<small>匹配</small></div><div class="chev">›</div></div>
-          <div class="school" onclick="openSchool(2)"><div class="rank">#3</div><div class="s-info"><h4>五邑司徒浩中學</h4><div class="s-tags"><span>九龍</span><span>資助</span><span>穩妥</span></div></div><div class="match">81%<small>匹配</small></div><div class="chev">›</div></div>
-        </section>
-      </main>
-    </div>
-
-    <div class="bottom-nav"><div class="navitem"><div class="nav-ico">⌂</div><div>首頁</div></div><div class="navitem"><div class="nav-ico">▣</div><div>擇校</div></div><div class="navitem active"><div class="nav-ico">◩</div><div>測評</div></div><div class="navitem"><div class="nav-ico">☻</div><div>我的</div></div><div class="homebar"></div></div>
-
-    <div class="modal-mask" id="modal" onclick="closeSchool(event)">
-      <div class="sheet" onclick="event.stopPropagation()">
-        <div class="handle"></div>
-        <div class="sheet-head"><div class="rank" id="mRank">#1</div><div><h3 id="mName">學校名稱</h3><div class="s-tags" id="mTags"></div></div><button class="close" onclick="hideModal()">×</button></div>
-        <div class="detail-grid"><div class="detail"><div class="k">建議類型</div><div class="v" id="mType"></div></div><div class="detail"><div class="k">預估匹配</div><div class="v" id="mMatch"></div></div><div class="detail"><div class="k">教學語言</div><div class="v">英文 / 中文支援</div></div><div class="detail"><div class="k">主要風險</div><div class="v">英文穩定度</div></div></div>
-        <div class="why"><b>為甚麼推薦？</b><ul id="mWhy"></ul></div>
-        <div class="dim"><div class="dim-row"><span>地區距離</span><div class="mini-track"><div class="mini-fill" style="width:92%"></div></div><span>92%</span></div><div class="dim-row"><span>學術匹配</span><div class="mini-track"><div class="mini-fill" id="mAcademic" style="width:76%"></div></div><span id="mAcademicText">76%</span></div><div class="dim-row"><span>語言適應</span><div class="mini-track"><div class="mini-fill" id="mLang" style="width:68%"></div></div><span id="mLangText">68%</span></div></div>
+      <div class="boy" aria-hidden="true"><div class="head"><div class="hair"></div><div class="glass"></div></div><div class="body"></div></div>
+      <div class="btn-main">開始測評<small>20分鐘幫你訂製專屬擇校報告</small></div>
+    </section>
+    <section class="quick">
+      <div class="quick-card"><div><h3>學校庫 ›</h3><p>學校一鍵查詢</p></div><div class="bubble">🎓</div></div>
+      <div class="quick-card"><div><h3>擇校指南 ›</h3><p>了解香港擇校</p></div><div class="bubble">📚</div></div>
+    </section>
+    <div class="title-row"><h2>錄取案例</h2></div>
+    <a class="case-window" href="kongu_case_profile.html" aria-label="查看 N同學錄取案例詳情">
+      <div class="thumb">👍</div><div class="ribbon">喜報</div>
+      <h3 class="case-title">N同學 測評提升：Band 2C → <em>Band 1A</em></h3>
+      <p class="case-sub">升中四 哈爾濱外國語學校</p>
+      <div class="case-card">
+        <div class="logo">協</div>
+        <div><p class="school">協恩中學</p><div class="meta"><span class="pill red">中四插班成功</span><span class="pill">筆試</span><span class="pill">面試</span></div><div class="date">申請/錄取時間：2025.06–2025.07</div></div>
       </div>
-    </div>
-  </div>
-<script>
-  const tabs=document.querySelectorAll('.tab');
-  tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active')}));
-  function toggleBar(el){el.classList.toggle('open')}
-  const slider=document.getElementById('scoreSlider');
-  const bandBadge=document.getElementById('bandBadge'), bandTitle=document.getElementById('bandTitle'), bandDesc=document.getElementById('bandDesc'), pctPill=document.getElementById('pctPill'), exceedPill=document.getElementById('exceedPill');
-  const scoreLabel=document.getElementById('scoreLabel'), sliderScore=document.getElementById('sliderScore'), bandLabelMini=document.getElementById('bandLabelMini'), topLabelMini=document.getElementById('topLabelMini');
-  function fmtScore(v){return Number.isInteger(v) ? v.toFixed(0)+'%' : v.toFixed(1)+'%'}
-  function calcRank(v){
-    // temporary default model: 70% = top 33.3%; every +1 score point improves ranking by 1.1 percentile points.
-    // For scores below 70, the same slope is used to show distance from Band 1 threshold.
-    const top = Math.max(1.0, Math.min(99.0, 33.3 - (v - 70) * 1.1));
-    return {top: top, exceed: 100 - top};
-  }
-  function calc(v){
-    v = Math.round(v*10)/10;
-    const r = calcRank(v);
-    const p = '前 '+r.top.toFixed(1)+'%';
-    const ex = '超越 '+r.exceed.toFixed(1)+'%';
-    let b='Band 2', short='B2';
-    if(v>=90){b='Band 1A'; short='1A';}
-    else if(v>=80){b='Band 1B'; short='1B';}
-    else if(v>=70){b='Band 1C'; short='1C';}
-    else if(v>=60){b='Band 2A'; short='2A';}
-    let d = `約屬香港同級${p}，即${ex}香港同級學生。`;
-    if(v>=90){d += ' 具備較強 Band 1 競爭力，可挑戰更高要求學校。';}
-    else if(v>=80){d += ' 英文能力已較穩定，適合進一步提升閱讀整合題。';}
-    else if(v>=70){d += ' 英文已進入 Band 1 邊緣能力，但 Grammar 和 Vocabulary 仍需鞏固。';}
-    else if(v>=60){d += ' 接近 Band 1 門檻，若目標為 Band 1 學校，建議先做針對訓練。';}
-    else {d += ' 暫未達 Band 1，需先補基礎閱讀與語法。';}
-    scoreLabel.textContent=fmtScore(v); sliderScore.textContent=fmtScore(v); bandLabelMini.textContent=b; topLabelMini.textContent=p; bandBadge.textContent=short; bandTitle.textContent=b+' 能力'; bandDesc.textContent=d; pctPill.textContent=p; exceedPill.textContent=ex; }
-  slider.addEventListener('input',e=>calc(+e.target.value)); calc(+slider.value);
-  const schools=[
-    {rank:'#1',name:'中華基督教會桂華山中學',tags:['港島','資助','合理目標'],type:'合理目標',match:'88%',academic:78,lang:70,why:['地區及家庭偏好匹配度高。','學生英文達 Band 1C 後，申請風險可降低。','學校支援及校風與學生性格較配合。']},
-    {rank:'#2',name:'聖士提反堂中學',tags:['港島','挑戰','需英文提升'],type:'進取挑戰',match:'84%',academic:70,lang:64,why:['學校吸引力較高，但競爭較強。','建議先把英文由 Band 1C 提升至 1B。','適合作為進取選項，不建議只用作保底。']},
-    {rank:'#3',name:'五邑司徒浩中學',tags:['九龍','資助','穩妥'],type:'穩妥選擇',match:'81%',academic:86,lang:76,why:['學術要求與目前能力較接近。','適合需要平衡適應壓力的學生。','可作為較穩妥的選校選項。']}
-  ];
-  function openSchool(i){const s=schools[i];document.getElementById('mRank').textContent=s.rank;document.getElementById('mName').textContent=s.name;document.getElementById('mType').textContent=s.type;document.getElementById('mMatch').textContent=s.match;document.getElementById('mTags').innerHTML=s.tags.map(x=>`<span>${x}</span>`).join('');document.getElementById('mWhy').innerHTML=s.why.map(x=>`<li>${x}</li>`).join('');document.getElementById('mAcademic').style.width=s.academic+'%';document.getElementById('mAcademicText').textContent=s.academic+'%';document.getElementById('mLang').style.width=s.lang+'%';document.getElementById('mLangText').textContent=s.lang+'%';document.getElementById('modal').classList.add('show')}
-  function hideModal(){document.getElementById('modal').classList.remove('show')}
-  function closeSchool(e){if(e.target.id==='modal') hideModal()}
-</script>
+      <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+    </a>
+    <div class="consult"><b>免費<br>咨詢</b><span class="tag">1v1</span><span>名優教育團隊幫你訂製各種升學服務</span><span style="margin-left:auto;color:#aaa">›</span></div>
+    <div class="float">人工咨詢</div>
+    <nav class="bottom"><a class="tab active" href="#"><i>⌂</i>首頁</a><a class="tab" href="#"><i>▣</i>擇校</a><a class="tab" href="#"><i>▱</i>測評</a><a class="tab" href="#"><i>☻</i>我的</a></nav>
+  </main>
 </body>
 </html>
