@@ -3,114 +3,335 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KongU 錄取案例 - Prototype</title>
+  <title>KongU 升學路線圖 · H5 Prototype</title>
   <style>
-    :root{
-      --bg:#f8f4fb;
-      --ink:#121426;
-      --muted:#8f8b99;
-      --purple:#8b5cf6;
-      --purple2:#6f6dfb;
-      --blue:#5a87ff;
-      --red:#ff3d61;
-      --pink:#fff0f4;
-      --card:#ffffff;
-      --line:#f0ebf6;
-      --shadow:0 12px 30px rgba(82,62,140,.12);
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #07142F; }
+    .app-root {
+      --bg: #0D1B3E; --card: rgba(255,255,255,.96);
+      --ink: #10203F; --soft: #61708D; --muted: #8A96B3; --line: rgba(126,151,213,.20);
+      --navy: #0D1B3E; --navy-2: #122552;
+      --brand: #6B4EE6; --brand-2: #3BC9DB; --brand-soft: #EEF1FF;
+      --cyan-soft: #E9FBFF; --accent: #7C5CFF; --accent-deep: #5037C7;
+      --gold: #F5B84B; --gold-deep: #B97816; --gold-soft: #FFF4DE;
+      min-height: 100vh; background: radial-gradient(circle at 20% 0%, rgba(59,201,219,.28), transparent 34%), radial-gradient(circle at 82% 10%, rgba(107,78,230,.34), transparent 36%), linear-gradient(180deg,#07142F,#0D1B3E 52%,#08142E);
+      font-family: 'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif; color: var(--ink);
+      display: flex; flex-direction: column; align-items: center; padding: 20px 12px 48px;
+      -webkit-font-smoothing: antialiased;
     }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#f7efff 0%,#fff7f3 45%,#f8f4fb 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","PingFang SC","Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;-webkit-font-smoothing:antialiased;}
-    .phone{width:447px;max-width:100%;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#faf4ff 0%,#fff 30%,#f8f4fb 100%);position:relative;overflow:hidden;padding-bottom:96px;}
-    .status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 42px;font-weight:800;color:#0b1020}
-    .island{position:absolute;left:50%;transform:translateX(-50%);top:16px;width:118px;height:32px;border-radius:999px;background:#000}
-    .icons{display:flex;gap:6px;align-items:center;font-size:13px}
-    .nav{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 24px;}
-    .brand{display:flex;align-items:flex-end;gap:12px}
-    .brand b{font-size:25px;letter-spacing:-.02em}
-    .brand span{font-size:13px;color:#25223a;transform:translateY(-3px)}
-    .more{height:34px;border-radius:999px;background:rgba(255,255,255,.75);box-shadow:0 8px 18px rgba(66,51,105,.1);display:flex;align-items:center;gap:14px;padding:0 14px;font-size:19px}
-    .hero{margin:18px 19px 22px;border-radius:22px;padding:22px 18px 19px;background:radial-gradient(circle at 78% 24%,rgba(255,255,255,.85),rgba(255,255,255,0) 34%),linear-gradient(135deg,#f5eaff,#fff1f1);box-shadow:var(--shadow);position:relative;overflow:hidden;}
-    .hero:after{content:"";position:absolute;right:-34px;top:18px;width:150px;height:150px;background:linear-gradient(135deg,#9b7cff,#4e83ff);border-radius:42% 58% 48% 52%;opacity:.16;}
-    .hero h1{font-size:28px;line-height:1.12;margin:0 120px 8px 0;font-weight:950;letter-spacing:-.02em;}
-    .hero .sub{color:#8c6cff;font-weight:700;margin-bottom:14px;font-size:14px}
-    .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;width:230px;position:relative;z-index:1}
-    .check{font-size:13px;color:#54506a;display:flex;gap:6px;align-items:center;white-space:nowrap}
-    .check i{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;background:#efe8ff;color:var(--purple);font-style:normal;font-size:11px;font-weight:900}
-    .boy{position:absolute;right:18px;top:48px;width:112px;height:152px;z-index:2}
-    .boy .head{width:52px;height:52px;background:#ffd4af;border-radius:50%;margin:0 auto;position:relative}
-    .boy .hair{position:absolute;left:5px;top:-3px;width:43px;height:19px;background:#17223c;border-radius:20px 20px 8px 8px;transform:rotate(-5deg)}
-    .boy .glass{position:absolute;left:8px;top:22px;width:36px;height:12px;border:3px solid #56a4ff;border-radius:8px}
-    .boy .body{width:82px;height:92px;border-radius:34px 34px 18px 18px;background:linear-gradient(180deg,#bfe9ff,#68a5ff);margin:-1px auto 0;box-shadow:inset 0 -16px 0 rgba(255,255,255,.22)}
-    .btn-main{margin-top:22px;height:64px;border-radius:16px;background:linear-gradient(135deg,#9d72ff,#5b82ff);color:#fff;display:grid;place-items:center;text-align:center;box-shadow:0 12px 24px rgba(111,109,251,.24);font-weight:900;font-size:18px}
-    .btn-main small{display:block;font-size:11px;font-weight:600;margin-top:2px;opacity:.9}
-    .quick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 19px 26px}
-    .quick-card{height:98px;border-radius:16px;background:#fff;box-shadow:var(--shadow);padding:20px 18px;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.8)}
-    .quick-card:nth-child(1){background:linear-gradient(135deg,#eef4ff,#fff2fb)}
-    .quick-card:nth-child(2){background:linear-gradient(135deg,#fff1e9,#fff8ef)}
-    .quick h3{margin:0 0 5px;font-size:17px}
-    .quick p{margin:0;color:#8e8797;font-size:12px}
-    .bubble{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:#fff;box-shadow:0 8px 18px rgba(106,83,180,.14)}
-    .title-row{display:flex;align-items:center;justify-content:space-between;margin:0 19px 12px}
-    .title-row h2{margin:0;font-size:20px;letter-spacing:-.01em}
-    .title-row a{font-size:13px;color:#9b96a5;text-decoration:none}
-    .case-window{margin:0 19px 24px;background:linear-gradient(135deg,#f0e9ff,#fff1ed);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);position:relative;padding:20px 18px 11px;text-decoration:none;color:inherit;display:block;}
-    .case-window:hover{transform:translateY(-1px)}
-    .thumb{position:absolute;right:32px;top:0;font-size:70px;opacity:.1;transform:rotate(-10deg)}
-    .ribbon{position:absolute;right:0;top:0;width:55px;height:68px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:18px;letter-spacing:.04em}
-    .ribbon:after{content:"";position:absolute;bottom:-13px;left:0;width:0;height:0;border-left:27.5px solid transparent;border-right:27.5px solid transparent;border-top:13px solid var(--red)}
-    .case-title{position:relative;z-index:1;margin:0 60px 8px 0;font-size:18px;line-height:1.25;font-weight:900;color:#36334d}
-    .case-title em{font-style:normal;color:#7d4dff}
-    .case-sub{position:relative;z-index:1;margin:0 60px 16px 0;color:#8f8b99;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .case-card{background:#fff;border-radius:10px;min-height:96px;display:flex;align-items:center;gap:15px;padding:15px 17px;position:relative;z-index:1;box-shadow:0 4px 16px rgba(99,78,155,.07)}
-    .logo{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#fff 38%,#eaf5ff 39%);border:2px solid #80a4e9;display:grid;place-items:center;color:#4d6dcf;font-weight:950;font-size:19px;flex:0 0 auto}
-    .school{margin:0 0 8px;font-weight:900;font-size:14px;line-height:1.25}
-    .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-    .pill{font-size:11px;font-weight:800;border-radius:5px;padding:4px 6px;color:#8b72ff;background:#f0ebff}
-    .pill.red{color:#ff5b6f;background:#fff0f2}
-    .date{font-size:12px;color:#9b96a5}
-    .dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
-    .dot{width:6px;height:6px;border-radius:50%;background:#e2dcef}.dot.active{background:#8b5cf6}
-    .consult{margin:0 19px 26px;height:54px;border-radius:14px;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;padding:0 16px;gap:10px;color:#6f6878;font-size:13px}
-    .consult b{color:#8b5cf6;font-size:17px;line-height:.95}.consult .tag{background:#8b5cf6;color:#fff;padding:3px 8px;border-radius:6px;font-weight:900}
-    .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:447px;max-width:100%;height:74px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid #f0edf6;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;z-index:20}
-    .tab{text-align:center;color:#6f7487;font-size:11px;text-decoration:none}.tab i{display:block;font-size:23px;margin-bottom:3px}.tab.active{color:#8b5cf6;font-weight:900}
-    .float{position:absolute;right:18px;top:790px;border-radius:22px;background:#fff;box-shadow:0 10px 24px rgba(79,65,120,.15);padding:7px 10px;text-align:center;font-size:12px;color:#5b5366;font-weight:800;z-index:5}
-    .float:before{content:"•••";display:block;margin:0 auto 2px;width:32px;height:22px;border-radius:999px;background:#8e72ff;color:#fff;line-height:13px;font-size:22px}
-    @media(max-width:460px){.phone{width:100%}.bottom{width:100%}}
+    .demo-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: center; }
+    .demo-bar span { font-size: 11px; color: rgba(255,255,255,.58); letter-spacing: .12em; }
+    .demo-bar button { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); backdrop-filter: blur(10px); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-family: inherit; color: #fff; cursor: pointer; }
+    .demo-bar button:hover { background: rgba(59,201,219,.18); }
+    .demo-bar button.primary { background: linear-gradient(90deg,var(--brand),var(--brand-2)); border-color: transparent; color: #fff; box-shadow: 0 8px 22px rgba(59,201,219,.24); }
+    .phone { width: 392px; max-width: 100%; background: var(--bg); border-radius: 34px; box-shadow: 0 28px 80px rgba(0,0,0,.42), 0 0 0 10px #050A18, 0 0 0 11px rgba(59,201,219,.16); overflow: hidden; position: relative; }
+    .screen { height: 760px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+    .screen::-webkit-scrollbar { display: none; }
+    .eta-wrap { position: sticky; top: 0; z-index: 30; padding: 14px 14px 8px; background: linear-gradient(180deg, rgba(13,27,62,.96) 78%, transparent); }
+    .eta-card { background: linear-gradient(180deg,rgba(255,255,255,.98),rgba(244,247,255,.96)); border: 1px solid rgba(59,201,219,.18); border-radius: 18px; box-shadow: 0 12px 32px rgba(0,0,0,.16), 0 0 24px rgba(59,201,219,.08); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+    .eta-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; position: relative; }
+    .eta-avatar::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid var(--gold); opacity: .5; animation: ringPulse 2s ease-out infinite; }
+    .eta-main { flex: 1; min-width: 0; }
+    .eta-main .who { font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+    .eta-main .big { font-size: 20px; font-weight: 900; letter-spacing: .02em; line-height: 1.3; }
+    .eta-main .big em { font-style: normal; color: var(--brand); }
+    .eta-side { text-align: right; flex: none; }
+    .eta-side .pct { font-size: 20px; font-weight: 900; color: var(--brand); font-variant-numeric: tabular-nums; }
+    .eta-side .lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; }
+    .eta-window { margin: 8px 4px 0; font-size: 11px; color: var(--soft); display: flex; align-items: center; gap: 6px; }
+    .eta-window i { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-2); display: inline-block; animation: dotBlink 1.6s ease infinite; }
+    .map { position: relative; margin: 4px 14px 12px; background: radial-gradient(circle at 20% 18%, rgba(59,201,219,.16), transparent 28%), radial-gradient(circle at 84% 60%, rgba(107,78,230,.14), transparent 30%), #F7F9FF; border-radius: 22px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(59,201,219,.18), 0 10px 26px rgba(0,0,0,.16); }
+    .map svg { display: block; width: 100%; height: auto; }
+    .map .streets path { stroke: #DFE6FA; stroke-width: 5; fill: none; stroke-linecap: round; }
+    .route-base { stroke: #D6DDF4; stroke-width: 7; fill: none; stroke-linecap: round; }
+    .route-ahead { stroke: var(--brand-2); stroke-width: 5; fill: none; stroke-linecap: round; stroke-dasharray: 2 12; animation: ants 1.4s linear infinite; }
+    .route-done { stroke: url(#routeGradient); stroke-width: 7; fill: none; stroke-linecap: round; transition: none; }
+    @keyframes ants { to { stroke-dashoffset: -28; } }
+    @keyframes ringPulse { 0% { transform: scale(.9); opacity: .7; } 100% { transform: scale(1.5); opacity: 0; } }
+    @keyframes dotBlink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes flagWave { 0%,100% { transform: skewX(0deg); } 50% { transform: skewX(-8deg); } }
+    @keyframes popIn { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .station { position: absolute; transform: translate(-50%, -50%); z-index: 5; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+    .station .dot { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 4px solid #BFC9E8; box-sizing: border-box; box-shadow: 0 0 0 3px rgba(255,255,255,.72); }
+    .station.done .dot { border-color: var(--brand-2); }
+    .station.final .dot { border-color: var(--navy); }
+    .station .tag { margin-top: 5px; background: rgba(255,255,255,.94); border: 1px solid var(--line); border-radius: 7px; padding: 3px 8px; font-size: 10px; font-weight: 700; color: var(--ink); white-space: nowrap; box-shadow: 0 2px 6px rgba(28,43,58,.08); }
+    .station .tag small { display: block; font-weight: 500; color: var(--muted); font-size: 9px; letter-spacing: .02em; }
+    .station.done .tag small { color: var(--brand); }
+    .dest { position: absolute; transform: translate(-50%, -100%); z-index: 6; display: flex; flex-direction: column; align-items: center; pointer-events: none; margin-top: -10px; }
+    .dest .flag { font-size: 22px; animation: flagWave 2.4s ease-in-out infinite; transform-origin: bottom left; }
+    .dest .name { background: var(--navy); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 7px; letter-spacing: .08em; }
+    .walker { position: absolute; transform: translate(-50%, -50%); z-index: 10; pointer-events: none; }
+    .walker .pulse { position: absolute; inset: -14px; border-radius: 50%; border: 2px solid var(--gold); animation: ringPulse 1.8s ease-out infinite; }
+    .walker .pulse.p2 { animation-delay: .9s; }
+    .walker .body { width: 42px; height: 42px; animation: bob 2s ease-in-out infinite; filter: drop-shadow(0 4px 8px rgba(28,43,58,.28)); }
+    .pin { position: absolute; transform: translate(-50%, -50%) rotate(-45deg); z-index: 8; width: 22px; height: 22px; border-radius: 50% 50% 50% 4px; background: linear-gradient(135deg,var(--brand),var(--brand-2)); border: 2px solid #fff; box-shadow: 0 3px 12px rgba(59,201,219,.42); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .pin::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #fff; transform: rotate(45deg); }
+    .pin-card { position: absolute; z-index: 20; width: 210px; background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 12px 30px rgba(28,43,58,.2); font-size: 11px; line-height: 1.7; animation: popIn .22s ease both; }
+    .pin-card b { display: block; color: var(--accent-deep); font-size: 12px; margin-bottom: 3px; }
+    .pin-card .close { position: absolute; top: 6px; right: 10px; color: var(--muted); cursor: pointer; font-size: 13px; }
+    .map-legend { position: absolute; left: 12px; bottom: 10px; z-index: 5; background: rgba(255,255,255,.9); border-radius: 9px; padding: 6px 10px; font-size: 9.5px; color: var(--soft); line-height: 1.7; }
+    .map-legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+    .sec { margin: 0 14px 12px; background: linear-gradient(180deg,rgba(255,255,255,.98),rgba(247,249,255,.96)); border: 1px solid rgba(59,201,219,.14); border-radius: 18px; padding: 16px; box-shadow: 0 8px 22px rgba(0,0,0,.11); }
+    .sec h3 { margin: 0 0 12px; font-size: 13px; font-weight: 900; letter-spacing: .1em; display: flex; align-items: center; gap: 6px; }
+    .sec h3::before { content: ""; width: 4px; height: 13px; border-radius: 2px; background: var(--brand); }
+    .ring-grid { display: flex; align-items: center; gap: 16px; }
+    .ring-box { position: relative; width: 110px; height: 110px; flex: none; }
+    .ring-box svg { transform: rotate(-90deg); }
+    .ring-box .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring-box .num b { font-size: 24px; font-weight: 900; color: var(--brand); font-variant-numeric: tabular-nums; }
+    .ring-box .num span { font-size: 9px; color: var(--muted); letter-spacing: .14em; }
+    .ring-stats { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .rstat { background: #F4F7FF; border: 1px solid rgba(107,78,230,.08); border-radius: 12px; padding: 9px 12px; }
+    .rstat b { font-size: 15px; font-weight: 900; }
+    .rstat span { display: block; font-size: 10px; color: var(--muted); letter-spacing: .06em; margin-top: 1px; }
+    .subj-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+    .subj-row label { width: 34px; font-size: 12px; font-weight: 700; flex: none; }
+    .subj-row .bar { flex: 1; height: 10px; background: #E9EEFF; border-radius: 999px; overflow: hidden; }
+    .subj-row .bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--brand), var(--brand-2)); width: 0; transition: width 1s cubic-bezier(.2,.7,.3,1); }
+    .subj-row .note { width: 128px; flex: none; font-size: 10px; color: var(--soft); text-align: right; }
+    .case-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+    .case-scroll::-webkit-scrollbar { display: none; }
+    .mini-case { flex: none; width: 168px; background: linear-gradient(160deg, #FFFFFF, #EEF9FF 52%, #F3F0FF); border: 1px solid rgba(59,201,219,.24); border-radius: 14px; padding: 12px 13px; }
+    .mini-case .badge { display: inline-block; background: linear-gradient(90deg,var(--brand),var(--brand-2)); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: .16em; padding: 2px 7px; border-radius: 4px; margin-bottom: 7px; }
+    .mini-case .path { font-size: 13px; font-weight: 900; }
+    .mini-case .path em { font-style: normal; color: var(--brand); }
+    .mini-case .who { font-size: 10px; color: var(--muted); margin: 2px 0 5px; }
+    .mini-case .school { font-size: 11px; font-weight: 700; line-height: 1.5; }
+    .mini-case .time { font-size: 10.5px; color: var(--accent-deep); font-weight: 700; margin-top: 4px; }
+    .cta { margin: 4px 14px 10px; }
+    .cta button { width: 100%; border: none; border-radius: 999px; padding: 15px; background: linear-gradient(90deg, var(--brand), var(--brand-2)); color: #fff; font-size: 15px; font-weight: 900; letter-spacing: .14em; font-family: inherit; cursor: pointer; box-shadow: 0 12px 28px rgba(59,201,219,.30), 0 4px 14px rgba(107,78,230,.22); }
+    .cta button:active { transform: scale(.98); }
+    .disclaimer { margin: 0 22px 22px; font-size: 9px; color: rgba(255,255,255,.52); line-height: 1.8; text-align: center; }
+    @media (prefers-reduced-motion: reduce) {
+      .walker .body, .walker .pulse, .route-ahead, .dest .flag, .eta-avatar::after, .eta-window i { animation: none !important; }
+    }
   </style>
 </head>
 <body>
-  <main class="phone">
-    <div class="status"><span>9:41</span><div class="island"></div><span class="icons">▮▮▮  Wi‑Fi  ▰</span></div>
-    <div class="nav"><div class="brand"><b>KongU</b><span>小一在讀 ▾</span></div><div class="more">••• ◎</div></div>
-    <section class="hero">
-      <h1>港校智能測評助手</h1>
-      <div class="sub">9000+ 真實升學案例 · 28 年升學服務經驗</div>
-      <div class="checks">
-        <span class="check"><i>✓</i>科學測評</span><span class="check"><i>✓</i>專業分析</span>
-        <span class="check"><i>✓</i>擇校建議</span><span class="check"><i>✓</i>學習規劃</span>
+  <div class="app-root">
+    <div class="demo-bar">
+      <span>演示控制(內部)</span>
+      <button class="primary" id="advanceBtn">模擬升一級 ↗</button>
+      <button id="replayBtn">重播入場動畫</button>
+    </div>
+    <div class="phone">
+      <div class="screen">
+        <div class="eta-wrap">
+          <div class="eta-card">
+            <div class="eta-avatar"><div data-face="small"></div></div>
+            <div class="eta-main">
+              <div class="who">陳同學 · 深圳 · 目標 Band 1A</div>
+              <div class="big" id="etaText">預計 <em>3 – 4.5</em> 個月抵達</div>
+            </div>
+            <div class="eta-side"><div class="pct" id="topPct">0%</div><div class="lbl">已完成</div></div>
+          </div>
+          <div class="eta-window"><i></i>目標 2027 年插班季(5–7 月)· 時間充裕</div>
+        </div>
+        <div class="map" id="mapBox">
+          <svg viewBox="0 0 360 620">
+            <defs><linearGradient id="routeGradient" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#6B4EE6"></stop><stop offset="100%" stop-color="#3BC9DB"></stop></linearGradient></defs>
+            <g class="streets" opacity=".7">
+              <path d="M 0 120 L 360 90"></path><path d="M 0 250 L 360 230"></path>
+              <path d="M 0 400 L 360 430"></path><path d="M 0 540 L 360 520"></path>
+              <path d="M 90 0 L 120 620"></path><path d="M 250 0 L 220 620"></path>
+              <path d="M 320 0 L 340 620"></path>
+            </g>
+            <path class="route-base" d="M 58 586 C 190 556 300 528 290 446 C 282 378 92 396 86 312 C 81 240 262 252 284 174 C 297 118 252 90 234 74"></path>
+            <path class="route-ahead" d="M 58 586 C 190 556 300 528 290 446 C 282 378 92 396 86 312 C 81 240 262 252 284 174 C 297 118 252 90 234 74"></path>
+            <path id="routeDone" class="route-done" d="M 58 586 C 190 556 300 528 290 446 C 282 378 92 396 86 312 C 81 240 262 252 284 174 C 297 118 252 90 234 74"></path>
+          </svg>
+          <div id="stationLayer"></div>
+          <div id="destLayer"></div>
+          <div id="pinLayer"></div>
+          <div class="walker" id="walker"><span class="pulse"></span><span class="pulse p2"></span><div data-face="body"></div></div>
+          <div class="map-legend">
+            <div><i style="background: var(--brand-2)"></i>已完成的級</div>
+            <div><i style="background: var(--gold)"></i>前方路線(每級約 1–1.5 個月)</div>
+          </div>
+        </div>
+        <div class="sec">
+          <h3>目前進度</h3>
+          <div class="ring-grid">
+            <div class="ring-box">
+              <svg viewBox="0 0 110 110" width="110" height="110">
+                <circle cx="55" cy="55" r="46" fill="none" stroke="#EFF1EC" stroke-width="10"></circle>
+                <circle id="ringProgress" cx="55" cy="55" r="46" fill="none" stroke="url(#rg)" stroke-width="10" stroke-linecap="round"></circle>
+                <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6B4EE6"></stop><stop offset="100%" stop-color="#3BC9DB"></stop></linearGradient></defs>
+              </svg>
+              <div class="num"><b id="ringPct">0%</b><span>距 BAND 1A</span></div>
+            </div>
+            <div class="ring-stats">
+              <div class="rstat"><b id="remainingSteps">3 級</b><span>尚餘級距(每級約 1–1.5 個月)</span></div>
+              <div class="rstat"><b id="targetTime">2026 年 11 月前</b><span>預計達到應考水平</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="sec">
+          <h3>三科診斷</h3>
+          <div class="subj-row"><label>中文</label><div class="bar"><i data-subj="55"></i></div><span class="note">重點:句式與排序</span></div>
+          <div class="subj-row"><label>英文</label><div class="bar"><i data-subj="55"></i></div><span class="note">重點:Sentence Writing</span></div>
+          <div class="subj-row"><label>數學</label><div class="bar"><i data-subj="70"></i></div><span class="note">優勢:數與代數</span></div>
+        </div>
+        <div class="sec">
+          <h3>同路人 · 真實錄取</h3>
+          <div class="case-scroll">
+            <div class="mini-case"><span class="badge">喜報</span><div class="path">2A  1A<em> ↗</em></div><div class="who">Y同學 · 蘇州 · 三校錄取</div><div class="school">寶血會上智英文書院</div><div class="time">歷時約 3 個月獲取錄</div></div>
+            <div class="mini-case"><span class="badge">喜報</span><div class="path">2A  1A<em> ↗</em></div><div class="who">P同學 · 上海 · 英文突破</div><div class="school">華英中學</div><div class="time">歷時約 3 個月獲取錄</div></div>
+            <div class="mini-case"><span class="badge">喜報</span><div class="path">1C  1A<em> ↗</em></div><div class="who">L同學 · 北京 · 特訓衝刺</div><div class="school">聖保羅書院</div><div class="time">歷時約 2 週獲取錄</div></div>
+            <div class="mini-case"><span class="badge">喜報</span><div class="path">2C  1A<em> ↗</em></div><div class="who">N同學 · 哈爾濱 · 階梯式錄取</div><div class="school">協恩中學</div><div class="time">歷時19 個月獲取錄</div></div>
+          </div>
+        </div>
+        <div class="cta"><button>預約升學顧問 · 鎖定 2027 插班季</button></div>
+        <p class="disclaimer">Banding 為 KongU 根據評測表現、題目難度、校內成績及選校結果綜合估算,並非教育局官方分組或保證錄取結果。時間估算基於歷屆真實個案及教學經驗,僅供規劃參考。</p>
       </div>
-      <div class="boy" aria-hidden="true"><div class="head"><div class="hair"></div><div class="glass"></div></div><div class="body"></div></div>
-      <div class="btn-main">開始測評<small>20分鐘幫你訂製專屬擇校報告</small></div>
-    </section>
-    <section class="quick">
-      <div class="quick-card"><div><h3>學校庫 ›</h3><p>學校一鍵查詢</p></div><div class="bubble">🎓</div></div>
-      <div class="quick-card"><div><h3>擇校指南 ›</h3><p>了解香港擇校</p></div><div class="bubble">📚</div></div>
-    </section>
-    <div class="title-row"><h2>錄取案例</h2></div>
-    <a class="case-window" href="kongu_case_profile.html" aria-label="查看 N同學錄取案例詳情">
-      <div class="thumb">👍</div><div class="ribbon">喜報</div>
-      <h3 class="case-title">N同學 測評提升：Band 2C → <em>Band 1A</em></h3>
-      <p class="case-sub">升中四 哈爾濱外國語學校</p>
-      <div class="case-card">
-        <div class="logo">協</div>
-        <div><p class="school">協恩中學</p><div class="meta"><span class="pill red">中四插班成功</span><span class="pill">筆試</span><span class="pill">面試</span></div><div class="date">申請/錄取時間：2025.06–2025.07</div></div>
-      </div>
-      <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-    </a>
-    <div class="consult"><b>免費<br>咨詢</b><span class="tag">1v1</span><span>名優教育團隊幫你訂製各種升學服務</span><span style="margin-left:auto;color:#aaa">›</span></div>
-    <div class="float">人工咨詢</div>
-    <nav class="bottom"><a class="tab active" href="#"><i>⌂</i>首頁</a><a class="tab" href="#"><i>▣</i>擇校</a><a class="tab" href="#"><i>▱</i>測評</a><a class="tab" href="#"><i>☻</i>我的</a></nav>
-  </main>
+    </div>
+  </div>
+  <script>
+    const NODES = [
+      { label: "入學評估", sub: "Band 2A · 已完成", band: "2A" },
+      { label: "Band 1C", sub: "約 1–1.5 個月", band: "1C" },
+      { label: "Band 1B", sub: "約 1–1.5 個月", band: "1B" },
+      { label: "Band 1A", sub: "目標校門", band: "1A", final: true }
+    ];
+    const PINS = [
+      { node: 0, who: "Y同學 · 蘇州", text: "同樣 Band 2A 起步,3 個月獲三校取錄,最終入讀寶血會上智英文書院(1A)。" },
+      { node: 1, who: "L同學 · 北京", text: "Band 1C 起步,4 日特訓營直入筆試面試,獲聖保羅書院(1A)取錄。" }
+    ];
+    const faceSvg = '<svg viewBox="0 0 48 48" class="body"><circle cx="24" cy="27" r="17" fill="#fff" stroke="#6B4EE6" stroke-width="2.5"/><circle cx="18" cy="26" r="2.2" fill="#0D1B3E"/><circle cx="30" cy="26" r="2.2" fill="#0D1B3E"/><path d="M 18.5 32.5 Q 24 37 29.5 32.5" stroke="#0D1B3E" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="13.5" cy="30" r="2.6" fill="#F6C6C0" opacity=".8"/><circle cx="34.5" cy="30" r="2.6" fill="#F6C6C0" opacity=".8"/><polygon points="24,2 44,11 24,20 4,11" fill="#0D1B3E"/><rect x="19" y="14" width="10" height="5" rx="2" fill="#0D1B3E"/><line x1="41" y1="12" x2="41" y2="22" stroke="#3BC9DB" stroke-width="2" stroke-linecap="round"/><circle cx="41" cy="23.5" r="2.4" fill="#3BC9DB"/></svg>';
+    document.querySelectorAll('[data-face]').forEach(el => el.innerHTML = faceSvg);
+
+    const path = document.getElementById('routeDone');
+    const walker = document.getElementById('walker');
+    const stationLayer = document.getElementById('stationLayer');
+    const destLayer = document.getElementById('destLayer');
+    const pinLayer = document.getElementById('pinLayer');
+    const topPct = document.getElementById('topPct');
+    const ringPct = document.getElementById('ringPct');
+    const etaText = document.getElementById('etaText');
+    const remainingSteps = document.getElementById('remainingSteps');
+    const targetTime = document.getElementById('targetTime');
+    const ringProgress = document.getElementById('ringProgress');
+    const ringR = 46;
+    const ringC = 2 * Math.PI * ringR;
+    let totalLen = 1;
+    let frac = 0;
+    let visited = 0;
+    let entered = false;
+    let raf = null;
+    let openPin = null;
+    const fracs = NODES.map((_, i) => i === 0 ? 0.14 : 0.14 + 0.86 * (i / (NODES.length - 1)));
+
+    function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function pointAt(f) { return path.getPointAtLength(f * totalLen); }
+    function cssPoint(p) { return { left: (p.x / 3.6) + '%', top: ((p.y / 620) * 100) + '%' }; }
+
+    function renderStations() {
+      stationLayer.innerHTML = '';
+      const stations = fracs.map(f => pointAt(f));
+      stations.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = `station ${i <= visited ? 'done' : ''} ${NODES[i].final ? 'final' : ''}`;
+        const pt = cssPoint(s);
+        div.style.left = pt.left;
+        div.style.top = pt.top;
+        const status = i <= visited ? (i === 0 ? '已完成 ✓' : '已到達 ✓') : NODES[i].sub;
+        div.innerHTML = `<span class="dot"></span><span class="tag">${NODES[i].label}<small>${status}</small></span>`;
+        stationLayer.appendChild(div);
+      });
+      const final = stations[NODES.length - 1];
+      const finalPt = cssPoint(final);
+      destLayer.innerHTML = `<div class="dest" style="left:${finalPt.left};top:${finalPt.top};"><span class="flag">🚩</span><span class="name">目標 Band 1A 學校</span></div>`;
+      renderPins(stations);
+    }
+
+    function renderPins(stations) {
+      pinLayer.innerHTML = '';
+      if (!entered) return;
+      PINS.forEach((p, i) => {
+        const s = stations[p.node];
+        const pin = document.createElement('div');
+        pin.className = 'pin';
+        pin.style.left = ((s.x + 34) / 3.6) + '%';
+        pin.style.top = (((s.y - 26) / 620) * 100) + '%';
+        pin.style.animation = 'popIn .3s ease both';
+        pin.style.animationDelay = `${i * 0.15}s`;
+        pin.addEventListener('click', () => { openPin = openPin === i ? null : i; renderPins(stations); });
+        pinLayer.appendChild(pin);
+      });
+      if (openPin !== null) {
+        const s = stations[PINS[openPin].node];
+        const card = document.createElement('div');
+        card.className = 'pin-card';
+        card.style.left = Math.min(58, (s.x + 40) / 3.6) + '%';
+        card.style.top = (((s.y - 10) / 620) * 100) + '%';
+        card.innerHTML = `<span class="close">✕</span><b>📍 同路人 · ${PINS[openPin].who}</b>${PINS[openPin].text}`;
+        card.querySelector('.close').addEventListener('click', () => { openPin = null; renderPins(stations); });
+        pinLayer.appendChild(card);
+      }
+    }
+
+    function updateUI() {
+      const p = pointAt(frac);
+      const pt = cssPoint(p);
+      walker.style.left = pt.left;
+      walker.style.top = pt.top;
+      path.style.strokeDasharray = totalLen;
+      path.style.strokeDashoffset = totalLen * (1 - frac);
+      const pct = Math.round(frac * 100);
+      topPct.textContent = pct + '%';
+      ringPct.textContent = pct + '%';
+      ringProgress.setAttribute('stroke-dasharray', ringC);
+      ringProgress.setAttribute('stroke-dashoffset', ringC * (1 - frac));
+      const remSteps = NODES.length - 1 - visited;
+      const etaLo = remSteps * 1;
+      const etaHi = remSteps * 1.5;
+      etaText.innerHTML = remSteps > 0 ? `預計 <em>${etaLo} – ${etaHi}</em> 個月抵達` : '已達目標水平 · 進入衝刺';
+      remainingSteps.textContent = remSteps + ' 級';
+      targetTime.textContent = remSteps > 0 ? '2026 年 11 月前' : '已達標';
+      renderStations();
+    }
+
+    function animateTo(from, to, dur, done) {
+      cancelAnimationFrame(raf);
+      const t0 = performance.now();
+      const tick = (t) => {
+        const k = Math.min(1, (t - t0) / dur);
+        frac = from + (to - from) * easeInOut(k);
+        updateUI();
+        if (k < 1) raf = requestAnimationFrame(tick);
+        else if (done) done();
+      };
+      raf = requestAnimationFrame(tick);
+    }
+
+    function advance() {
+      if (visited >= NODES.length - 1) return;
+      const next = visited + 1;
+      animateTo(frac, fracs[next], 1400);
+      visited = next;
+      openPin = null;
+      updateUI();
+    }
+
+    function replay() {
+      visited = 0;
+      openPin = null;
+      entered = false;
+      frac = 0;
+      updateUI();
+      setTimeout(() => animateTo(0, fracs[0], 1600, () => { entered = true; document.querySelectorAll('[data-subj]').forEach(el => { el.style.width = el.dataset.subj + '%'; }); updateUI(); }), 60);
+    }
+
+    document.getElementById('advanceBtn').addEventListener('click', advance);
+    document.getElementById('replayBtn').addEventListener('click', replay);
+    window.addEventListener('load', () => {
+      totalLen = path.getTotalLength();
+      ringProgress.setAttribute('stroke-dasharray', ringC);
+      replay();
+    });
+  </script>
 </body>
 </html>
